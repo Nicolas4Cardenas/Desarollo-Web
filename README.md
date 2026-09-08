@@ -121,9 +121,9 @@ La separación de roles permite establecer diferentes niveles de acceso y respon
 
 ## 📐 Diagramas
 
-### 📊 Diagrama de Clases
+### 📊 Diagrama de Relacion
 
-![Diagrama de Clases](DiagramaClases_Corregido.png)
+![Diagrama de Relacion](DiagramaClases_Corregido.png)
 
 ### 🏗️ Diagrama de Arquitectura
 

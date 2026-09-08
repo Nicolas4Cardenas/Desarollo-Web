@@ -1,66 +1,193 @@
+## 🛠️ Herramientas
+
+![UML](https://img.shields.io/badge/UML-Modelado-blue)
+![PlantUML](https://img.shields.io/badge/PlantUML-Diagramas-orange)
+![Git](https://img.shields.io/badge/Git-Control%20de%20versiones-red)
+![GitHub](https://img.shields.io/badge/GitHub-Repositorio-black)
+![Web](https://img.shields.io/badge/Web-Development-green)
+
+## 🛠️ Herramientas y tecnologías
+
+[![My Skills](https://skillicons.dev/icons?i=git,github,html,css,js)](https://skillicons.dev)
+
+**Modelado:** UML · PlantUML  
+**Control de versiones:** Git · GitHub
+
+
 # 🍽️ Sistema de Gestión de Pedidos
 
-### Proyecto de Desarrollo Web — Universidad Politécnico Grancolombiano
+### 🎓 Proyecto de Desarrollo Web — Universidad Politécnico Grancolombiano
 
-> Sistema web orientado a la gestión y seguimiento de pedidos en un entorno de restaurante.
-
----
-
-## 📌 Descripción
-
-Este proyecto consiste en el diseño y desarrollo de un sistema web para gestionar de manera organizada el proceso de pedidos de un restaurante.
-
-La solución permite centralizar la información relacionada con **usuarios, roles, mesas, pedidos, productos y estados**, facilitando el control del proceso desde la creación del pedido hasta su entrega.
+> 💡 Sistema web diseñado para facilitar la gestión de pedidos de un restaurante de forma organizada, sencilla y eficiente.
 
 ---
 
-## 🎯 Objetivos
+## 🚀 ¿Qué hace?
 
-- 👤 Gestionar usuarios y roles.
-- 🔐 Controlar el acceso al sistema.
-- 🪑 Administrar las mesas.
-- 📋 Crear y gestionar pedidos.
-- 🔗 Asociar varias mesas a un mismo pedido.
-- 🍔 Administrar productos y categorías.
-- 📝 Registrar el detalle de cada pedido.
-- 🔄 Mantener un historial de cambios de estado.
-- 📊 Mantener la información organizada mediante un modelo de datos estructurado.
+El sistema permite administrar los principales elementos de un restaurante:
 
----
+- 👤 **Usuarios y roles**
+- 🪑 **Mesas**
+- 📋 **Pedidos**
+- 🍔 **Productos y categorías**
+- 🔄 **Estados e historial de pedidos**
 
-## 🚀 Funcionalidades principales
+Una de las características principales es que **un pedido puede estar asociado a varias mesas**, permitiendo manejar pedidos compartidos entre diferentes mesas.
 
-| Módulo | Descripción |
-|---|---|
-| 👤 Usuarios | Gestión de usuarios del sistema |
-| 🔐 Roles | Control de los diferentes perfiles |
-| 🪑 Mesas | Administración y estado de las mesas |
-| 📋 Pedidos | Creación y seguimiento de pedidos |
-| 🔗 Pedido-Mesa | Permite asociar varias mesas a un pedido |
-| 🍔 Productos | Gestión de productos disponibles |
-| 🗂️ Categorías | Clasificación de productos |
-| 📝 Detalles | Productos y cantidades de cada pedido |
-| 🔄 Historial | Registro de cambios de estado |
+También se registra el **historial de estados** de cada pedido para conocer su evolución y el usuario responsable de cada cambio.
 
 ---
 
-## 🏗️ Modelo de datos
-
-El sistema se estructura mediante las siguientes relaciones principales:
+## 🏗️ Estructura del sistema
 
 ```text
-ROL 1 ───── N USUARIO
-              │
-              │ 1:N
-              ▼
-           PEDIDO
-          /   │    \
-         /    │     \
-        ▼     ▼      ▼
- PEDIDO_MESA  DETALLE  HISTORIAL_ESTADO
-      │          │           │
-      ▼          ▼           ▼
-     MESA     PRODUCTO     USUARIO
-                  │
-                  ▼
-              CATEGORIA
+Usuario
+   │
+   ▼
+Pedido ──────────► Historial_Estado
+   │
+   ├──► Pedido_Mesa ───► Mesa
+   │
+   └──► Detalle_Pedido ───► Producto ───► Categoría
+```
+
+### 🔗 Relaciones principales
+
+- 👤 **Rol → Usuario:** un rol puede estar asignado a varios usuarios.
+- 📋 **Usuario → Pedido:** un usuario puede gestionar varios pedidos.
+- 🪑 **Pedido → Mesa:** un pedido puede estar asociado a una o varias mesas.
+- 📝 **Pedido → Detalle:** un pedido puede contener diferentes detalles.
+- 🍔 **Detalle → Producto:** cada detalle corresponde a un producto.
+- 🗂️ **Categoría → Producto:** una categoría puede contener varios productos.
+- 🔄 **Pedido → Historial:** un pedido puede tener varios registros de estado.
+
+---
+
+## 🪑 Pedido y mesas
+
+Una característica importante del sistema es permitir que un mismo pedido pueda involucrar diferentes mesas.
+
+```text
+📋 PEDIDO #001
+     │
+     ├── 🪑 Mesa 4
+     ├── 🪑 Mesa 5
+     └── 🪑 Mesa 6
+```
+
+Para esto se utiliza la entidad intermedia `pedido_mesa`.
+
+Esto permite una mayor flexibilidad en la gestión de pedidos y evita limitar cada pedido a una única mesa.
+
+---
+
+## 🔄 Historial de pedidos
+
+Cada pedido puede pasar por diferentes estados durante su proceso:
+
+```text
+🟡 Pendiente
+      ↓
+🔵 En preparación
+      ↓
+🟢 Listo
+      ↓
+✅ Entregado
+```
+
+El sistema registra el estado, la fecha y el usuario responsable del cambio, permitiendo mantener la **trazabilidad del pedido**.
+
+---
+
+## 🍔 Productos
+
+Los productos se organizan mediante categorías y contienen información como:
+
+- 🏷️ Nombre
+- 📝 Descripción
+- 💰 Precio
+- 📦 Disponibilidad
+- 🗂️ Categoría
+
+Esto permite mantener un catálogo organizado y facilitar su utilización dentro de los pedidos.
+
+---
+
+## 👤 Usuarios y roles
+
+El sistema contempla diferentes roles para controlar las responsabilidades de los usuarios.
+
+```text
+🔐 Rol
+   │
+   └──► 👤 Usuario
+```
+
+La separación de roles permite establecer diferentes niveles de acceso y responsabilidades dentro del sistema.
+
+---
+
+## 📐 Diagramas
+
+### 📊 Diagrama de Clases
+
+![Diagrama de Clases](DiagramaClases_Corregido.png)
+
+### 🏗️ Diagrama de Arquitectura
+
+![Diagrama de Arquitectura](Diagrama%20Arquitectura.png)
+
+## 📊 Entidades principales
+
+| Entidad | Descripción |
+|---|---|
+| 👤 `usuario` | Usuarios que interactúan con el sistema |
+| 🔐 `rol` | Roles de los usuarios |
+| 🪑 `mesa` | Mesas disponibles |
+| 📋 `pedido` | Información general de los pedidos |
+| 🔗 `pedido_mesa` | Relación entre pedidos y mesas |
+| 📝 `detalle_pedido` | Productos incluidos en cada pedido |
+| 🍔 `producto` | Productos disponibles |
+| 🗂️ `categoria` | Clasificación de productos |
+| 🔄 `historial_estado` | Historial de cambios de los pedidos |
+
+---
+
+## 📈 Estado del proyecto
+
+🚧 **En desarrollo**
+
+### 📐 Análisis y diseño
+
+- ✅ Levantamiento de requisitos
+- ✅ Historias de usuario
+- ✅ Modelo de datos
+- ✅ Corrección de relaciones
+- ✅ Diagrama de clases
+- ✅ Diagrama de arquitectura
+
+### 💻 Desarrollo
+
+- ⬜ Frontend
+- ⬜ Backend
+- ⬜ Base de datos
+- ⬜ Autenticación
+- ⬜ Gestión de usuarios y roles
+- ⬜ Gestión de mesas
+- ⬜ Gestión de pedidos
+- ⬜ Gestión de productos
+- ⬜ Historial de estados
+
+### 🧪 Pruebas
+
+- ⬜ Pruebas funcionales
+- ⬜ Pruebas de integración
+- ⬜ Corrección de errores
+- ⬜ 🚀 Despliegue
+
+---
+
+## 🎓 Proyecto académico
+
+**Universidad:** Politécnico Grancolombiano  
+**Asignatura:** Desarrollo Web

@@ -186,8 +186,14 @@ La separación de roles permite establecer diferentes niveles de acceso y respon
 - ⬜ 🚀 Despliegue
 
 ---
+## 👥 Integrantes
+
+- **Juan Miguel Parra Garzón**
+- **Nicolas Abril Cárdenas**
+- **Santiago Cortes Mojica**
 
 ## 🎓 Proyecto académico
 
 **Universidad:** Politécnico Grancolombiano  
 **Asignatura:** Desarrollo Web
+

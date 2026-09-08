@@ -133,6 +133,10 @@ La separación de roles permite establecer diferentes niveles de acceso y respon
 
 ![Diagrama de Componentes](Diagrama%20De%20Componentes.jpg)
 
+### 📦 Diagrama de Despliegue
+
+![Diagrama de Despliegue](diagrama%20de%20despliegue.png)
+
 ## 📊 Entidades principales
 
 | Entidad | Descripción |

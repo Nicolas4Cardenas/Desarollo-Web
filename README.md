@@ -137,6 +137,10 @@ La separación de roles permite establecer diferentes niveles de acceso y respon
 
 ![Diagrama de Arquitectura](Diagrama%20Arquitectura.png)
 
+### 🏗️ Diagrama de Componentes
+
+![Diagrama de Componentes](Diagrama%20De%20Componentes.jpg)
+
 ## 📊 Entidades principales
 
 | Entidad | Descripción |

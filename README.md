@@ -6,14 +6,6 @@
 ![GitHub](https://img.shields.io/badge/GitHub-Repositorio-black)
 ![Web](https://img.shields.io/badge/Web-Development-green)
 
-## 🛠️ Herramientas y tecnologías
-
-[![My Skills](https://skillicons.dev/icons?i=git,github,html,css,js)](https://skillicons.dev)
-
-**Modelado:** UML · PlantUML  
-**Control de versiones:** Git · GitHub
-
-
 # 🍽️ Sistema de Gestión de Pedidos
 
 ### 🎓 Proyecto de Desarrollo Web — Universidad Politécnico Grancolombiano

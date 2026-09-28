@@ -172,14 +172,13 @@ Requisitos: MySQL 8 y MySQL Workbench.
 .
 ├── README.md
 ├── BackendPolirestaurante.rar
-└── diagramas/
-    ├── Diagrama_de_Clases.png
-    ├── Diagrama_Relacional.png
-    ├── Diagrama_de_Arquitectura.png
-    ├── Diagrama_de_Componentes.png
-    ├── Diagrama_de_Despliegue.png
-    ├── Diagrama_de_Navegacion.png
-    └── fuentes/  (archivos .dot editables)
+├── Diagrama_de_Clases.png
+├── Diagrama_Relacional.png
+├── Diagrama_de_Arquitectura.png
+├── Diagrama_de_Componentes.png
+├── Diagrama_de_Despliegue.png
+├── Diagrama_de_Navegacion.png
+
 ```
 
 ---

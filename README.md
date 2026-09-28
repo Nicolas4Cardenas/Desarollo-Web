@@ -1,4 +1,4 @@
-## 🛠️ Herramientas
+# 🍽️ Polirestaurante — Sistema de Gestión de Pedidos
 
 ![UML](https://img.shields.io/badge/UML-Modelado-blue)
 ![PlantUML](https://img.shields.io/badge/PlantUML-Diagramas-orange)
@@ -7,238 +7,171 @@
 ![GitHub](https://img.shields.io/badge/GitHub-Repositorio-black)
 ![Web](https://img.shields.io/badge/Web-Development-green)
 
-# 🍽️ Sistema de Gestión de Pedidos
+Sistema web para gestionar los pedidos de un restaurante: desde que el mesero toma la orden en sala, pasando por la preparación en cocina, hasta la entrega y el análisis de ventas y tiempos.
 
-### 🎓 Proyecto de Desarrollo Web — Universidad Politécnico Grancolombiano
-
-> 💡 Sistema web diseñado para facilitar la gestión de pedidos de un restaurante de forma organizada, sencilla y eficiente.
+🎓 Proyecto académico de la asignatura Desarrollo de Software, Politécnico Grancolombiano.
 
 ---
 
-## 🚀 ¿Qué hace?
+## 🚀 Características
 
-El sistema permite administrar los principales elementos de un restaurante:
-
-- 👤 **Usuarios y roles**
-- 🪑 **Mesas**
-- 📋 **Pedidos**
-- 🍔 **Productos y categorías**
-- 🔄 **Estados e historial de pedidos**
-
-Una de las características principales es que **un pedido puede estar asociado a varias mesas**, permitiendo manejar pedidos compartidos entre diferentes mesas.
-
-También se registra el **historial de estados** de cada pedido para conocer su evolución y el usuario responsable de cada cambio.
+- Gestión de usuarios con tres roles: mesero, cocina y administrador.
+- Creación y edición de pedidos, con productos, cantidades y notas (por ejemplo, "sin cebolla").
+- Un mismo pedido puede asociarse a varias mesas.
+- Cola de pedidos para cocina, ordenada por fecha de creación y actualizada en tiempo real.
+- Ciclo de estados controlado: Pendiente, En preparación, Listo, Entregado y Cancelado.
+- Historial de estados inmutable, con fecha y usuario responsable de cada cambio.
+- Administración de menú, categorías, mesas y usuarios.
+- Reportes de ventas (por fechas, categoría y producto) y de tiempos de preparación.
+- Autenticación y control de acceso por rol validado en el backend.
 
 ---
 
-## 🏗️ Estructura del sistema
+## 👥 Roles
 
-```text
-Usuario
-   │
-   ▼
-Pedido ──────────► Historial_Estado
-   │
-   ├──► Pedido_Mesa ───► Mesa
-   │
-   └──► Detalle_Pedido ───► Producto ───► Categoría
-```
-
-### 🔗 Relaciones principales
-
-- 👤 **Rol → Usuario:** un rol puede estar asignado a varios usuarios.
-- 📋 **Usuario → Pedido:** un usuario puede gestionar varios pedidos.
-- 🪑 **Pedido → Mesa:** un pedido puede estar asociado a una o varias mesas.
-- 📝 **Pedido → Detalle:** un pedido puede contener diferentes detalles.
-- 🍔 **Detalle → Producto:** cada detalle corresponde a un producto.
-- 🗂️ **Categoría → Producto:** una categoría puede contener varios productos.
-- 🔄 **Pedido → Historial:** un pedido puede tener varios registros de estado.
-
----
-
-## 🪑 Pedido y mesas
-
-Una característica importante del sistema es permitir que un mismo pedido pueda involucrar diferentes mesas.
-
-```text
-📋 PEDIDO #001
-     │
-     ├── 🪑 Mesa 4
-     ├── 🪑 Mesa 5
-     └── 🪑 Mesa 6
-```
-
-Para esto se utiliza la entidad intermedia `pedido_mesa`.
-
-Esto permite una mayor flexibilidad en la gestión de pedidos y evita limitar cada pedido a una única mesa.
-
----
-
-## 🔄 Historial de pedidos
-
-Cada pedido puede pasar por diferentes estados durante su proceso:
-
-```text
-🟡 Pendiente
-      ↓
-🔵 En preparación
-      ↓
-🟢 Listo
-      ↓
-✅ Entregado
-```
-
-El sistema registra el estado, la fecha y el usuario responsable del cambio, permitiendo mantener la **trazabilidad del pedido**.
-
----
-
-## 🍔 Productos
-
-Los productos se organizan mediante categorías y contienen información como:
-
-- 🏷️ Nombre
-- 📝 Descripción
-- 💰 Precio
-- 📦 Disponibilidad
-- 🗂️ Categoría
-
-Esto permite mantener un catálogo organizado y facilitar su utilización dentro de los pedidos.
-
----
-
-## 👤 Usuarios y roles
-
-El sistema contempla tres roles para controlar las responsabilidades de los usuarios:
-
-```text
-🔐 Rol
-   │
-   ├──► 👨‍💼 ADMINISTRADOR  — gestiona menú, usuarios y reportes
-   ├──► 🧑‍🍳 COCINA         — ve la cola de pedidos y cambia su estado
-   └──► 🧑‍🤝‍🧑 MESERO         — crea y gestiona pedidos en sala
-```
-
-El control de acceso se valida **en la base de datos**, no solo en el frontend (RNF-06), garantizando que cada rol solo pueda ejecutar las operaciones que le corresponden.
-
----
-
-## 🗄️ Backend — Base de datos
-
-El backend está implementado íntegramente en **MySQL 8** mediante procedimientos almacenados, triggers y funciones. No requiere ningún servidor de aplicaciones adicional para su funcionamiento.
-
-### 📂 Archivos
-
-El archivo `BackendPolirestaurante.rar` contiene:
-
-| Archivo | Descripción |
+| Rol | Qué puede hacer |
 |---|---|
-| `backend.sql` | Esquema completo: tablas, triggers, funciones y stored procedures |
-| `Prueba.sql` | Script de pruebas: flujo feliz (8 escenarios) y casos de error (13 escenarios) |
+| 🧑‍🤝‍🧑 Mesero | Crear pedidos, agregar, modificar o quitar productos, marcar como entregado y cancelar |
+| 🧑‍🍳 Cocina | Ver la cola de pendientes, iniciar la preparación y marcar pedidos como listos |
+| 👨‍💼 Administrador | Gestionar menú, categorías, mesas y usuarios, y consultar reportes |
 
-### ▶️ Cómo ejecutar
+---
 
-1. Tener instalado **MySQL 8** y **MySQL Workbench**
-2. Abrir `backend.sql` en Workbench y ejecutar con `Ctrl + Shift + Enter`
-3. Abrir `Prueba.sql` y ejecutar de la misma forma
-4. El script de pruebas debe completarse con **1 solo error** (caso E1, intencional)
+## 🔄 Flujo de un pedido
 
-### 🧩 Módulos implementados
+```text
+🟡 PENDIENTE  ->  🔵 EN PREPARACIÓN  ->  🟢 LISTO  ->  ✅ ENTREGADO
 
-| Módulo | Procedimientos |
+Cualquier estado anterior a ENTREGADO  ->  ❌ CANCELADO
+```
+
+Reglas principales:
+
+- Solo se pueden editar los productos de un pedido mientras está en estado Pendiente.
+- Cocina solo puede pasar un pedido de Pendiente a En preparación, y de En preparación a Listo.
+- Un pedido solo se marca como Entregado si está en estado Listo.
+- Un pedido entregado no se puede cancelar.
+- El estado de la mesa (libre u ocupada) cambia automáticamente al crear o cerrar un pedido.
+
+---
+
+## 🗃️ Modelo de datos
+
+```text
+rol ──► usuario ──► pedido ──► historial_estado
+                      │
+                      ├──► pedido_mesa ──► mesa
+                      │
+                      └──► detalle_pedido ──► producto ◄── categoria
+```
+
+| Entidad | Descripción |
 |---|---|
-| 🧑‍🤝‍🧑 Mesero | Crear pedido, agregar/modificar/quitar productos, marcar entregado, cancelar |
-| 🧑‍🍳 Cocina | Ver cola, iniciar preparación, marcar listo |
-| 👨‍💼 Administración | Gestionar menú, usuarios, categorías, reportes de ventas y tiempos |
-| 🔐 Autenticación | Login con validación de hash bcrypt |
+| `rol` | Roles del sistema (administrador, cocina, mesero) |
+| `usuario` | Usuarios, con su hash de contraseña y su rol |
+| `mesa` | Mesas del restaurante y su estado |
+| `pedido` | Pedido, mesero que lo creó, estado y fechas |
+| `pedido_mesa` | Relación muchos a muchos entre pedidos y mesas |
+| `detalle_pedido` | Productos, cantidades y notas de cada pedido |
+| `producto` | Productos del menú con precio y disponibilidad |
+| `categoria` | Clasificación de los productos |
+| `historial_estado` | Registro de cada cambio de estado de un pedido |
 
-### 🔒 Seguridad implementada
+---
 
-- Contraseñas almacenadas como **hash bcrypt** (nunca texto plano)
-- Control de acceso por rol validado en cada procedimiento
-- Historial de estados **inmutable** (protegido por triggers)
-- Transacciones en todas las operaciones críticas
+## 🏗️ Arquitectura
+
+El sistema está pensado en capas:
+
+1. **Presentación:** interfaces web para mesero, cocina y administración, accesibles desde navegador en PC, tablet o celular.
+2. **Lógica de negocio (API REST):** gestores de pedidos, reportes, usuarios y mesas, y menú, junto con el módulo de autenticación (JWT) y las notificaciones en tiempo real por WebSocket.
+3. **Acceso a datos:** DAO para pedidos, historial de estados, usuarios y productos.
+4. **Persistencia:** base de datos MySQL transaccional.
+
+En despliegue, el navegador se comunica con el servidor de aplicaciones por HTTPS y WSS, y este con el servidor de base de datos por TCP/IP (puerto 3306).
 
 ---
 
 ## 📐 Diagramas
 
-### 📊 Diagrama de Relación
+### Diagrama de clases
 
-![Diagrama de Relacion](DiagramaClases_Corregido.png)
+![Diagrama de clases](DiagramaClases_Corregido.png)
 
-### 🏗️ Diagrama de Arquitectura
+### Diagrama de arquitectura
 
-![Diagrama de Arquitectura](Diagrama%20Arquitectura.png)
+![Diagrama de arquitectura](Diagrama%20Arquitectura.png)
 
-### ⚙️ Diagrama de Componentes
+### Diagrama de componentes
 
-![Diagrama de Componentes](Diagrama%20De%20Componentes.jpg)
+![Diagrama de componentes](Diagrama%20De%20Componentes.jpg)
 
-### 📦 Diagrama de Despliegue
+### Diagrama de despliegue
 
-![Diagrama de Despliegue](diagrama%20de%20despliegue.png)
+![Diagrama de despliegue](diagrama%20de%20despliegue.png)
 
 ---
 
-## 📊 Entidades principales
+## 🛢️ Backend — Base de datos
 
-| Entidad | Descripción |
+El backend está implementado en **MySQL 8** mediante procedimientos almacenados, triggers y funciones.
+
+El archivo `BackendPolirestaurante.rar` contiene:
+
+| Archivo | Descripción |
 |---|---|
-| 👤 `usuario` | Usuarios que interactúan con el sistema |
-| 🔐 `rol` | Roles de los usuarios |
-| 🪑 `mesa` | Mesas disponibles |
-| 📋 `pedido` | Información general de los pedidos |
-| 🔗 `pedido_mesa` | Relación entre pedidos y mesas |
-| 📝 `detalle_pedido` | Productos incluidos en cada pedido |
-| 🍔 `producto` | Productos disponibles |
-| 🗂️ `categoria` | Clasificación de productos |
-| 🔄 `historial_estado` | Historial de cambios de los pedidos |
+| `backend.sql` | Esquema completo: tablas, triggers, funciones y procedimientos almacenados |
+| `Prueba.sql` | Pruebas: flujo feliz (8 escenarios) y casos de error (13 escenarios) |
+
+### Procedimientos por módulo
+
+| Módulo | Operaciones |
+|---|---|
+| 🧑‍🤝‍🧑 Mesero | Crear pedido, agregar, modificar y quitar productos, marcar entregado, cancelar |
+| 🧑‍🍳 Cocina | Ver cola, iniciar preparación, marcar listo |
+| 👨‍💼 Administración | Gestionar menú, usuarios y categorías; reportes de ventas y tiempos |
+| 🔐 Autenticación | Login con validación de hash bcrypt |
+
+### 🔒 Seguridad
+
+- Contraseñas almacenadas como hash bcrypt, nunca en texto plano.
+- Control de acceso por rol validado en cada procedimiento.
+- Historial de estados protegido por triggers para que no se pueda editar ni borrar.
+- Transacciones en todas las operaciones críticas.
+
+### ▶️ Cómo ejecutarlo
+
+Requisitos: MySQL 8 y MySQL Workbench.
+
+1. Descomprimir `BackendPolirestaurante.rar`.
+2. Abrir `backend.sql` en Workbench y ejecutarlo con `Ctrl + Shift + Enter`.
+3. Abrir `Prueba.sql` y ejecutarlo de la misma forma.
+4. El script de pruebas debe terminar con un solo error (caso E1, intencional).
 
 ---
 
 ## 📈 Estado del proyecto
 
-🚧 **En desarrollo**
+🚧 En desarrollo
 
-### 📐 Análisis y diseño
-
-- ✅ Levantamiento de requisitos
-- ✅ Historias de usuario
-- ✅ Modelo de datos
-- ✅ Corrección de relaciones
-- ✅ Diagrama de clases
-- ✅ Diagrama de arquitectura
-
-### 💻 Desarrollo
-
+- ✅ Levantamiento de requisitos e historias de usuario
+- ✅ Modelo de datos y diagramas (clases, arquitectura, componentes y despliegue)
+- ✅ Base de datos y backend en MySQL
+- ✅ Autenticación, usuarios, roles, mesas, pedidos, productos e historial de estados
+- ✅ Pruebas funcionales y de control de acceso
+- ⬜ API REST y notificaciones en tiempo real
 - ⬜ Frontend
-- ✅ Backend (MySQL 8 — stored procedures, triggers, control de roles)
-- ✅ Base de datos
-- ✅ Autenticación
-- ✅ Gestión de usuarios y roles
-- ✅ Gestión de mesas
-- ✅ Gestión de pedidos
-- ✅ Gestión de productos
-- ✅ Historial de estados
-
-### 🧪 Pruebas
-
-- ✅ Pruebas funcionales (flujo feliz — 8 escenarios)
-- ✅ Pruebas de control de acceso y errores (13 escenarios)
 - ⬜ Pruebas de integración
-- ⬜ Corrección de errores
-- ⬜ 🚀 Despliegue
+- ⬜ Despliegue
 
 ---
 
-## 👥 Integrantes
+## 🤝 Integrantes
 
-- **Juan Miguel Parra Garzón**
-- **Nicolas Abril Cárdenas**
-- **Santiago Cortes Mojica**
+- Juan Miguel Parra Garzón
+- Nicolas Abril Cárdenas
+- Santiago Cortes Mojica
 
-## 🎓 Proyecto académico
-
-**Universidad:** Politécnico Grancolombiano  
-**Asignatura:** Desarrollo Web
-
+**Universidad:** Politécnico Grancolombiano
+**Asignatura:** Desarrollo de Software
+**Docente:** Yamid Ramírez

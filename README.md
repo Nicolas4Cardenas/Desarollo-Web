@@ -95,37 +95,36 @@ En despliegue, el navegador se comunica con el servidor de aplicaciones por HTTP
 
 ## 📐 Diagramas
 
-Las imágenes están en la carpeta [`diagramas/`](diagramas/) (los archivos `.dot` de `diagramas/fuentes/` sirven para editarlas con Graphviz).
 
 ### Diagrama de clases
 
 Modelo orientado a objetos (UML) con atributos, métodos y multiplicidades.
 
-![Diagrama de clases](diagramas/Diagrama_de_Clases.png)
+![Diagrama de clases](Diagrama_de_Clases.png)
 
 ### Diagrama relacional
 
 Modelo de la base de datos MySQL con llaves primarias, foráneas y cardinalidades.
 
-![Diagrama relacional](diagramas/Diagrama_Relacional.png)
+![Diagrama relacional](Diagrama_Relacional.png)
 
 ### Diagrama de arquitectura
 
-![Diagrama de arquitectura](diagramas/Diagrama_de_Arquitectura.png)
+![Diagrama de arquitectura](Diagrama_de_Arquitectura.png)
 
 ### Diagrama de componentes
 
-![Diagrama de componentes](diagramas/Diagrama_de_Componentes.png)
+![Diagrama de componentes](Diagrama_de_Componentes.png)
 
 ### Diagrama de despliegue
 
-![Diagrama de despliegue](diagramas/Diagrama_de_Despliegue.png)
+![Diagrama de despliegue](Diagrama_de_Despliegue.png)
 
 ### Diagrama de navegación
 
 Pantallas de cada rol y las historias de usuario (HU) que cubren.
 
-![Diagrama de navegación](diagramas/Diagrama_de_Navegacion.png)
+![Diagrama de navegación](Diagrama_de_Navegacion.png)
 
 ---
 

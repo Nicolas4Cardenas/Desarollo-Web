@@ -1,4 +1,4 @@
-# 🍽️ Polirestaurante — CRUDs de Nicolas Abril (cocina, historial y reportes)
+# Polirestaurante — CRUDs de Nicolas Abril (cocina, historial y reportes)
 
 Servicio REST en **FastAPI** + **MySQL 8**, probado con **Postman**.
 Cubre **HU-06, HU-07, HU-08** (cocina), **HU-13, HU-14** (reportes) y **HU-15** (historial de estados).
@@ -15,7 +15,7 @@ Las tres usan **la misma base de datos** y deben dar **los mismos resultados**.
 
 ---
 
-# 🚀 1. Ponerlo a funcionar (sirve desde cualquier PC)
+#  1. Ponerlo a funcionar (sirve desde cualquier PC)
 
 **Programas necesarios:** Python 3.10+, MySQL 8 con MySQL Workbench, Postman y VS Code.
 
@@ -34,7 +34,7 @@ cd "Desarollo-Web/CRUDS - Nicolas Abril"
 ```sql
 SELECT id_usuario, usuario_login FROM poli_restaurante.usuario;
 ```
-> ⚠️ `backend.sql` borra y recrea la base `poli_restaurante`.
+>  `backend.sql` borra y recrea la base `poli_restaurante`.
 
 ### Paso 3 — Cargar los datos de demostración
 En Workbench: abrir `sql/datos_demo.sql` y ejecutarlo. Al final debe mostrar `1, 2, 3, 4`
@@ -139,7 +139,7 @@ Resumir: 3 modalidades, mismas reglas, historial inmutable, transacciones. Menci
 
 ---
 
-# 📚 4. Referencia de rutas
+#  4. Referencia de rutas
 
 | HU | Procedimientos | Driver | ORM |
 |---|---|---|---|
@@ -154,7 +154,7 @@ Resumir: 3 modalidades, mismas reglas, historial inmutable, transacciones. Menci
 - Historial: `POST` (crear, `201`), `GET` (listar, con `?id_pedido=`), `GET /{id}`, `PUT` y `DELETE` (`403`).
 - Errores: `400` rango o estado inválido · `403` rol sin permiso o historial inmutable · `404` no existe · `409` cambio de estado no permitido o pedido sin productos · `422` falta un campo.
 
-## 📝 Alcance
+##  Alcance
 - Esta carpeta cubre HU-06, 07, 08, 13, 14 y 15. El módulo del mesero (HU-01 a 05) está en `CRUDS - Juan Parra`.
 - No hay login ni JWT: el usuario se identifica con `id_usuario`.
 - El esquema es el de `backend.sql`; esta carpeta no lo modifica.

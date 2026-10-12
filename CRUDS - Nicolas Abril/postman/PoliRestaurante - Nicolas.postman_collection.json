@@ -1,0 +1,2215 @@
+{
+  "info": {
+    "name": "PoliRestaurante - Nicolas",
+    "description": "Pruebas de HU-06, 07, 08, 13, 14 y 15 en tres modalidades: procedimientos almacenados, driver (SQL directo) y ORM. Antes de empezar: ejecutar backend.sql y sql/datos_demo.sql. Ejecutar CARPETA POR CARPETA, en orden (clic derecho > Run folder). Entre las carpetas 1-3 y la 5 hay que ejecutar sql/entregar_demo.sql.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://127.0.0.1:8000"
+    },
+    {
+      "key": "ventas_sp",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "0 - Salud",
+      "description": "Comprueba que la API conecta con MySQL.",
+      "item": [
+        {
+          "name": "0.1 Salud",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/salud",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "salud"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "1 - Cocina con procedimientos almacenados (pedido 1)",
+      "description": "Ruta: /cocina/pedidos. Requiere sql/datos_demo.sql.",
+      "item": [
+        {
+          "name": "1.1 Ver cola (cocina)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/cocina/pedidos?id_usuario=4",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "cocina",
+                "pedidos"
+              ],
+              "query": [
+                {
+                  "key": "id_usuario",
+                  "value": "4"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "1.2 Ver cola sin permiso (mesero)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 403\", function () { pm.response.to.have.status(403); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/cocina/pedidos?id_usuario=2",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "cocina",
+                "pedidos"
+              ],
+              "query": [
+                {
+                  "key": "id_usuario",
+                  "value": "2"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "1.3 Pasar a EN_PREPARACION",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/cocina/pedidos/1/en-preparacion",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "cocina",
+                "pedidos",
+                "1",
+                "en-preparacion"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"id_usuario\": 4}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "1.4 Repetir el cambio (inválido)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 409\", function () { pm.response.to.have.status(409); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/cocina/pedidos/1/en-preparacion",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "cocina",
+                "pedidos",
+                "1",
+                "en-preparacion"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"id_usuario\": 4}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "1.5 Saltar estado (pedido 4 sigue PENDIENTE)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 409\", function () { pm.response.to.have.status(409); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/cocina/pedidos/4/listo",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "cocina",
+                "pedidos",
+                "4",
+                "listo"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"id_usuario\": 4}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "1.6 Rol incorrecto (mesero)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 403\", function () { pm.response.to.have.status(403); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/cocina/pedidos/4/en-preparacion",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "cocina",
+                "pedidos",
+                "4",
+                "en-preparacion"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"id_usuario\": 2}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "1.7 Pedido inexistente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 404\", function () { pm.response.to.have.status(404); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/cocina/pedidos/999/listo",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "cocina",
+                "pedidos",
+                "999",
+                "listo"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"id_usuario\": 4}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "1.8 Marcar LISTO",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/cocina/pedidos/1/listo",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "cocina",
+                "pedidos",
+                "1",
+                "listo"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"id_usuario\": 4}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "2 - Cocina con driver (pedido 2)",
+      "description": "Ruta: /driver/cocina/pedidos. SQL escrito a mano con mysql-connector.",
+      "item": [
+        {
+          "name": "2.1 Ver cola (cocina)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/driver/cocina/pedidos?id_usuario=4",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "driver",
+                "cocina",
+                "pedidos"
+              ],
+              "query": [
+                {
+                  "key": "id_usuario",
+                  "value": "4"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "2.2 Ver cola sin permiso (mesero)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 403\", function () { pm.response.to.have.status(403); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/driver/cocina/pedidos?id_usuario=2",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "driver",
+                "cocina",
+                "pedidos"
+              ],
+              "query": [
+                {
+                  "key": "id_usuario",
+                  "value": "2"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "2.3 Pasar a EN_PREPARACION",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/driver/cocina/pedidos/2/en-preparacion",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "driver",
+                "cocina",
+                "pedidos",
+                "2",
+                "en-preparacion"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"id_usuario\": 4}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "2.4 Repetir el cambio (inválido)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 409\", function () { pm.response.to.have.status(409); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/driver/cocina/pedidos/2/en-preparacion",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "driver",
+                "cocina",
+                "pedidos",
+                "2",
+                "en-preparacion"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"id_usuario\": 4}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "2.5 Saltar estado (pedido 4 sigue PENDIENTE)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 409\", function () { pm.response.to.have.status(409); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/driver/cocina/pedidos/4/listo",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "driver",
+                "cocina",
+                "pedidos",
+                "4",
+                "listo"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"id_usuario\": 4}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "2.6 Rol incorrecto (mesero)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 403\", function () { pm.response.to.have.status(403); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/driver/cocina/pedidos/4/en-preparacion",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "driver",
+                "cocina",
+                "pedidos",
+                "4",
+                "en-preparacion"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"id_usuario\": 2}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "2.7 Pedido inexistente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 404\", function () { pm.response.to.have.status(404); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/driver/cocina/pedidos/999/listo",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "driver",
+                "cocina",
+                "pedidos",
+                "999",
+                "listo"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"id_usuario\": 4}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "2.8 Marcar LISTO",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/driver/cocina/pedidos/2/listo",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "driver",
+                "cocina",
+                "pedidos",
+                "2",
+                "listo"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"id_usuario\": 4}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "3 - Cocina con ORM (pedido 3)",
+      "description": "Ruta: /orm/cocina/pedidos. SQLAlchemy, sin SQL a mano.",
+      "item": [
+        {
+          "name": "3.1 Ver cola (cocina)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/orm/cocina/pedidos?id_usuario=4",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "orm",
+                "cocina",
+                "pedidos"
+              ],
+              "query": [
+                {
+                  "key": "id_usuario",
+                  "value": "4"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "3.2 Ver cola sin permiso (mesero)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 403\", function () { pm.response.to.have.status(403); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/orm/cocina/pedidos?id_usuario=2",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "orm",
+                "cocina",
+                "pedidos"
+              ],
+              "query": [
+                {
+                  "key": "id_usuario",
+                  "value": "2"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "3.3 Pasar a EN_PREPARACION",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/orm/cocina/pedidos/3/en-preparacion",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "orm",
+                "cocina",
+                "pedidos",
+                "3",
+                "en-preparacion"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"id_usuario\": 4}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "3.4 Repetir el cambio (inválido)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 409\", function () { pm.response.to.have.status(409); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/orm/cocina/pedidos/3/en-preparacion",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "orm",
+                "cocina",
+                "pedidos",
+                "3",
+                "en-preparacion"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"id_usuario\": 4}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "3.5 Saltar estado (pedido 4 sigue PENDIENTE)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 409\", function () { pm.response.to.have.status(409); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/orm/cocina/pedidos/4/listo",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "orm",
+                "cocina",
+                "pedidos",
+                "4",
+                "listo"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"id_usuario\": 4}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "3.6 Rol incorrecto (mesero)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 403\", function () { pm.response.to.have.status(403); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/orm/cocina/pedidos/4/en-preparacion",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "orm",
+                "cocina",
+                "pedidos",
+                "4",
+                "en-preparacion"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"id_usuario\": 2}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "3.7 Pedido inexistente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 404\", function () { pm.response.to.have.status(404); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/orm/cocina/pedidos/999/listo",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "orm",
+                "cocina",
+                "pedidos",
+                "999",
+                "listo"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"id_usuario\": 4}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "3.8 Marcar LISTO",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/orm/cocina/pedidos/3/listo",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "orm",
+                "cocina",
+                "pedidos",
+                "3",
+                "listo"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"id_usuario\": 4}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "4 - Historial de estados (CRUD, inmutable)",
+      "description": "Ejecutar después de las carpetas 1 a 3.",
+      "item": [
+        {
+          "name": "4a.1 Listar todo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/historial",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "historial"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "4a.2 Filtrar por pedido",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/historial?id_pedido=1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "historial"
+              ],
+              "query": [
+                {
+                  "key": "id_pedido",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "4a.3 Obtener por id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/historial/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "historial",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "4a.4 Crear registro",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 201\", function () { pm.response.to.have.status(201); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/historial",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "historial"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"id_pedido\": 4, \"estado\": \"PENDIENTE\", \"id_usuario_cambio\": 1}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "4a.5 Actualizar (bloqueado)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 403\", function () { pm.response.to.have.status(403); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/historial/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "historial",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "4a.6 Borrar (bloqueado)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 403\", function () { pm.response.to.have.status(403); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/historial/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "historial",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "4a.7 Pedido inexistente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 404\", function () { pm.response.to.have.status(404); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/historial",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "historial"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"id_pedido\": 999, \"estado\": \"LISTO\", \"id_usuario_cambio\": 1}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "4a.8 Estado inválido",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 400\", function () { pm.response.to.have.status(400); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/historial",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "historial"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"id_pedido\": 1, \"estado\": \"INVENTADO\", \"id_usuario_cambio\": 1}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "4b.1 Listar todo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/orm/historial",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "orm",
+                "historial"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "4b.2 Filtrar por pedido",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/orm/historial?id_pedido=1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "orm",
+                "historial"
+              ],
+              "query": [
+                {
+                  "key": "id_pedido",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "4b.3 Obtener por id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/orm/historial/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "orm",
+                "historial",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "4b.4 Crear registro",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 201\", function () { pm.response.to.have.status(201); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/orm/historial",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "orm",
+                "historial"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"id_pedido\": 4, \"estado\": \"PENDIENTE\", \"id_usuario_cambio\": 1}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "4b.5 Actualizar (bloqueado)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 403\", function () { pm.response.to.have.status(403); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/orm/historial/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "orm",
+                "historial",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "4b.6 Borrar (bloqueado)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 403\", function () { pm.response.to.have.status(403); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/orm/historial/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "orm",
+                "historial",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "4b.7 Pedido inexistente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 404\", function () { pm.response.to.have.status(404); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/orm/historial",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "orm",
+                "historial"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"id_pedido\": 999, \"estado\": \"LISTO\", \"id_usuario_cambio\": 1}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "4b.8 Estado inválido",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 400\", function () { pm.response.to.have.status(400); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/orm/historial",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "orm",
+                "historial"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"id_pedido\": 1, \"estado\": \"INVENTADO\", \"id_usuario_cambio\": 1}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "5 - Reportes (antes ejecutar sql/entregar_demo.sql)",
+      "description": "Los tres modos deben devolver lo mismo. 5a: procedimientos, 5b: driver, 5c: ORM.",
+      "item": [
+        {
+          "name": "5a.1 Ventas del mes (admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", function () { pm.response.to.have.status(200); });",
+                  "const t = pm.response.json().totales;",
+                  "pm.collectionVariables.set(\"ventas_sp\", JSON.stringify({p: Number(t.productos_vendidos), v: Number(t.total_ventas)}));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/reportes/ventas?id_usuario=1&desde=2026-10-01&hasta=2026-10-31",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "reportes",
+                "ventas"
+              ],
+              "query": [
+                {
+                  "key": "id_usuario",
+                  "value": "1"
+                },
+                {
+                  "key": "desde",
+                  "value": "2026-10-01"
+                },
+                {
+                  "key": "hasta",
+                  "value": "2026-10-31"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "5a.2 Ventas sin permiso (mesero)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 403\", function () { pm.response.to.have.status(403); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/reportes/ventas?id_usuario=2&desde=2026-10-01&hasta=2026-10-31",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "reportes",
+                "ventas"
+              ],
+              "query": [
+                {
+                  "key": "id_usuario",
+                  "value": "2"
+                },
+                {
+                  "key": "desde",
+                  "value": "2026-10-01"
+                },
+                {
+                  "key": "hasta",
+                  "value": "2026-10-31"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "5a.3 Ventas con rango inválido",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 400\", function () { pm.response.to.have.status(400); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/reportes/ventas?id_usuario=1&desde=2026-10-31&hasta=2026-10-01",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "reportes",
+                "ventas"
+              ],
+              "query": [
+                {
+                  "key": "id_usuario",
+                  "value": "1"
+                },
+                {
+                  "key": "desde",
+                  "value": "2026-10-31"
+                },
+                {
+                  "key": "hasta",
+                  "value": "2026-10-01"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "5a.4 Tiempos de preparación (admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/reportes/tiempos?id_usuario=1&desde=2026-10-01&hasta=2026-10-31",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "reportes",
+                "tiempos"
+              ],
+              "query": [
+                {
+                  "key": "id_usuario",
+                  "value": "1"
+                },
+                {
+                  "key": "desde",
+                  "value": "2026-10-01"
+                },
+                {
+                  "key": "hasta",
+                  "value": "2026-10-31"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "5b.1 Ventas del mes (admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", function () { pm.response.to.have.status(200); });",
+                  "const t = pm.response.json().totales;",
+                  "const ref = JSON.parse(pm.collectionVariables.get(\"ventas_sp\") || \"{}\");",
+                  "pm.test(\"Mismo resultado que la versión con procedimientos\", function () {",
+                  "  pm.expect(Number(t.productos_vendidos)).to.eql(ref.p);",
+                  "  pm.expect(Number(t.total_ventas)).to.eql(ref.v);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/driver/reportes/ventas?id_usuario=1&desde=2026-10-01&hasta=2026-10-31",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "driver",
+                "reportes",
+                "ventas"
+              ],
+              "query": [
+                {
+                  "key": "id_usuario",
+                  "value": "1"
+                },
+                {
+                  "key": "desde",
+                  "value": "2026-10-01"
+                },
+                {
+                  "key": "hasta",
+                  "value": "2026-10-31"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "5b.2 Ventas sin permiso (mesero)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 403\", function () { pm.response.to.have.status(403); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/driver/reportes/ventas?id_usuario=2&desde=2026-10-01&hasta=2026-10-31",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "driver",
+                "reportes",
+                "ventas"
+              ],
+              "query": [
+                {
+                  "key": "id_usuario",
+                  "value": "2"
+                },
+                {
+                  "key": "desde",
+                  "value": "2026-10-01"
+                },
+                {
+                  "key": "hasta",
+                  "value": "2026-10-31"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "5b.3 Ventas con rango inválido",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 400\", function () { pm.response.to.have.status(400); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/driver/reportes/ventas?id_usuario=1&desde=2026-10-31&hasta=2026-10-01",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "driver",
+                "reportes",
+                "ventas"
+              ],
+              "query": [
+                {
+                  "key": "id_usuario",
+                  "value": "1"
+                },
+                {
+                  "key": "desde",
+                  "value": "2026-10-31"
+                },
+                {
+                  "key": "hasta",
+                  "value": "2026-10-01"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "5b.4 Tiempos de preparación (admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/driver/reportes/tiempos?id_usuario=1&desde=2026-10-01&hasta=2026-10-31",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "driver",
+                "reportes",
+                "tiempos"
+              ],
+              "query": [
+                {
+                  "key": "id_usuario",
+                  "value": "1"
+                },
+                {
+                  "key": "desde",
+                  "value": "2026-10-01"
+                },
+                {
+                  "key": "hasta",
+                  "value": "2026-10-31"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "5c.1 Ventas del mes (admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", function () { pm.response.to.have.status(200); });",
+                  "const t = pm.response.json().totales;",
+                  "const ref = JSON.parse(pm.collectionVariables.get(\"ventas_sp\") || \"{}\");",
+                  "pm.test(\"Mismo resultado que la versión con procedimientos\", function () {",
+                  "  pm.expect(Number(t.productos_vendidos)).to.eql(ref.p);",
+                  "  pm.expect(Number(t.total_ventas)).to.eql(ref.v);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/orm/reportes/ventas?id_usuario=1&desde=2026-10-01&hasta=2026-10-31",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "orm",
+                "reportes",
+                "ventas"
+              ],
+              "query": [
+                {
+                  "key": "id_usuario",
+                  "value": "1"
+                },
+                {
+                  "key": "desde",
+                  "value": "2026-10-01"
+                },
+                {
+                  "key": "hasta",
+                  "value": "2026-10-31"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "5c.2 Ventas sin permiso (mesero)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 403\", function () { pm.response.to.have.status(403); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/orm/reportes/ventas?id_usuario=2&desde=2026-10-01&hasta=2026-10-31",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "orm",
+                "reportes",
+                "ventas"
+              ],
+              "query": [
+                {
+                  "key": "id_usuario",
+                  "value": "2"
+                },
+                {
+                  "key": "desde",
+                  "value": "2026-10-01"
+                },
+                {
+                  "key": "hasta",
+                  "value": "2026-10-31"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "5c.3 Ventas con rango inválido",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 400\", function () { pm.response.to.have.status(400); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/orm/reportes/ventas?id_usuario=1&desde=2026-10-31&hasta=2026-10-01",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "orm",
+                "reportes",
+                "ventas"
+              ],
+              "query": [
+                {
+                  "key": "id_usuario",
+                  "value": "1"
+                },
+                {
+                  "key": "desde",
+                  "value": "2026-10-31"
+                },
+                {
+                  "key": "hasta",
+                  "value": "2026-10-01"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "5c.4 Tiempos de preparación (admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Responde 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/orm/reportes/tiempos?id_usuario=1&desde=2026-10-01&hasta=2026-10-31",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "orm",
+                "reportes",
+                "tiempos"
+              ],
+              "query": [
+                {
+                  "key": "id_usuario",
+                  "value": "1"
+                },
+                {
+                  "key": "desde",
+                  "value": "2026-10-01"
+                },
+                {
+                  "key": "hasta",
+                  "value": "2026-10-31"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

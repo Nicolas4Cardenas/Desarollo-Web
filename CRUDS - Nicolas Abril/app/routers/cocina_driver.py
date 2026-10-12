@@ -9,7 +9,7 @@ from app.db import get_connection
 
 router = APIRouter(prefix="/driver/cocina/pedidos", tags=["Cocina (driver)"])
 
-# Transiciones que puede hacer cocina: estado actual -> estado nuevo
+# Transiciones que puede hacer cocina: estado nuevo -> estado actual requerido
 TRANSICIONES_COCINA = {
     "EN_PREPARACION": "PENDIENTE",
     "LISTO": "EN_PREPARACION",

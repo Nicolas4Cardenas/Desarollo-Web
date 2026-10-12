@@ -1,0 +1,1290 @@
+{
+  "info": {
+    "name": "Polirestaurante REST - Módulo Mesero (HU-01 a HU-05)",
+    "description": "CRUD REST con Flask para pedidos. Requiere la API corriendo en http://localhost:5000 y backend.sql cargado.\nEjecutar las carpetas en orden (Collection Runner). Usuarios semilla: mesero1=2, mesero2=3, cocina1=4.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:5000/api/v1"
+    },
+    {
+      "key": "id_mesero",
+      "value": "2"
+    },
+    {
+      "key": "id_mesero2",
+      "value": "3"
+    },
+    {
+      "key": "id_cocina",
+      "value": "4"
+    },
+    {
+      "key": "id_mesa",
+      "value": "1"
+    },
+    {
+      "key": "id_mesa_2",
+      "value": "2"
+    },
+    {
+      "key": "id_pedido",
+      "value": ""
+    },
+    {
+      "key": "id_detalle",
+      "value": ""
+    },
+    {
+      "key": "id_detalle_2",
+      "value": ""
+    },
+    {
+      "key": "id_pedido_cancelar",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "0. Utilidades",
+      "description": "",
+      "item": [
+        {
+          "name": "Salud del servicio",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/salud",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "salud"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Menú disponible",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Usuario-Id",
+                "value": "{{id_mesero}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/menu",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "menu"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Mesas libres",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Usuario-Id",
+                "value": "{{id_mesero}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/mesas/libres",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "mesas",
+                "libres"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "HU-01 Crear pedido",
+      "description": "",
+      "item": [
+        {
+          "name": "Crear pedido (mesa libre)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 201\", function () { pm.response.to.have.status(201); });",
+                  "pm.collectionVariables.set(\"id_pedido\", pm.response.json().pedido.id_pedido);\npm.test(\"Estado PENDIENTE\", function () { pm.expect(pm.response.json().pedido.estado).to.eql(\"PENDIENTE\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Usuario-Id",
+                "value": "{{id_mesero}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/pedidos",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "pedidos"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id_mesa\": {{id_mesa}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Crea el pedido en estado PENDIENTE, registra fecha/hora y marca la mesa como ocupada. Guarda id_pedido en las variables."
+          }
+        },
+        {
+          "name": "ERROR: mesa ocupada",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 409\", function () { pm.response.to.have.status(409); });",
+                  "pm.test(\"codigo = MESA_OCUPADA\", function () { pm.expect(pm.response.json().codigo).to.eql(\"MESA_OCUPADA\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Usuario-Id",
+                "value": "{{id_mesero}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/pedidos",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "pedidos"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id_mesa\": {{id_mesa}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "ERROR: mesa inexistente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 404\", function () { pm.response.to.have.status(404); });",
+                  "pm.test(\"codigo = MESA_NO_EXISTE\", function () { pm.expect(pm.response.json().codigo).to.eql(\"MESA_NO_EXISTE\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Usuario-Id",
+                "value": "{{id_mesero}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/pedidos",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "pedidos"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id_mesa\": 999\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "ERROR: falta id_mesa",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 400\", function () { pm.response.to.have.status(400); });",
+                  "pm.test(\"codigo = CAMPO_REQUERIDO\", function () { pm.expect(pm.response.json().codigo).to.eql(\"CAMPO_REQUERIDO\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Usuario-Id",
+                "value": "{{id_mesero}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/pedidos",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "pedidos"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "ERROR: usuario cocina no puede crear",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 403\", function () { pm.response.to.have.status(403); });",
+                  "pm.test(\"codigo = ACCESO_DENEGADO\", function () { pm.expect(pm.response.json().codigo).to.eql(\"ACCESO_DENEGADO\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Usuario-Id",
+                "value": "{{id_cocina}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/pedidos",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "pedidos"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id_mesa\": 3\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "ERROR: sin cabecera X-Usuario-Id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 401\", function () { pm.response.to.have.status(401); });",
+                  "pm.test(\"codigo = NO_AUTENTICADO\", function () { pm.expect(pm.response.json().codigo).to.eql(\"NO_AUTENTICADO\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/pedidos",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "pedidos"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id_mesa\": 3\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "HU-02 Agregar productos",
+      "description": "",
+      "item": [
+        {
+          "name": "Agregar Hamburguesa x2 (sin cebolla)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 201\", function () { pm.response.to.have.status(201); });",
+                  "pm.collectionVariables.set(\"id_detalle\", pm.response.json().id_detalle);\npm.test(\"Total 44000\", function () { pm.expect(pm.response.json().total).to.eql(44000); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Usuario-Id",
+                "value": "{{id_mesero}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/pedidos/{{id_pedido}}/productos",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "pedidos",
+                "{{id_pedido}}",
+                "productos"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id_producto\": 3,\n  \"cantidad\": 2,\n  \"notas\": \"sin cebolla\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Agregar Gaseosa x1",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 201\", function () { pm.response.to.have.status(201); });",
+                  "pm.collectionVariables.set(\"id_detalle_2\", pm.response.json().id_detalle);\npm.test(\"Total 48500\", function () { pm.expect(pm.response.json().total).to.eql(48500); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Usuario-Id",
+                "value": "{{id_mesero}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/pedidos/{{id_pedido}}/productos",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "pedidos",
+                "{{id_pedido}}",
+                "productos"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id_producto\": 5,\n  \"cantidad\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "ERROR: cantidad 0",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 400\", function () { pm.response.to.have.status(400); });",
+                  "pm.test(\"codigo = CAMPO_INVALIDO\", function () { pm.expect(pm.response.json().codigo).to.eql(\"CAMPO_INVALIDO\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Usuario-Id",
+                "value": "{{id_mesero}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/pedidos/{{id_pedido}}/productos",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "pedidos",
+                "{{id_pedido}}",
+                "productos"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id_producto\": 3,\n  \"cantidad\": 0\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "ERROR: producto inexistente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 404\", function () { pm.response.to.have.status(404); });",
+                  "pm.test(\"codigo = PRODUCTO_NO_EXISTE\", function () { pm.expect(pm.response.json().codigo).to.eql(\"PRODUCTO_NO_EXISTE\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Usuario-Id",
+                "value": "{{id_mesero}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/pedidos/{{id_pedido}}/productos",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "pedidos",
+                "{{id_pedido}}",
+                "productos"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id_producto\": 999,\n  \"cantidad\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "ERROR: pedido de otro mesero",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 403\", function () { pm.response.to.have.status(403); });",
+                  "pm.test(\"codigo = ACCESO_DENEGADO\", function () { pm.expect(pm.response.json().codigo).to.eql(\"ACCESO_DENEGADO\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Usuario-Id",
+                "value": "{{id_mesero2}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/pedidos/{{id_pedido}}/productos",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "pedidos",
+                "{{id_pedido}}",
+                "productos"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id_producto\": 3,\n  \"cantidad\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "HU-03 Editar / quitar productos",
+      "description": "",
+      "item": [
+        {
+          "name": "Editar cantidad de la hamburguesa (3)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Total 70500\", function () { pm.expect(pm.response.json().total).to.eql(70500); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "X-Usuario-Id",
+                "value": "{{id_mesero}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/pedidos/{{id_pedido}}/productos/{{id_detalle}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "pedidos",
+                "{{id_pedido}}",
+                "productos",
+                "{{id_detalle}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cantidad\": 3,\n  \"notas\": \"sin cebolla, bien cocida\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Quitar la gaseosa",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Total 66000\", function () { pm.expect(pm.response.json().total).to.eql(66000); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "X-Usuario-Id",
+                "value": "{{id_mesero}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/pedidos/{{id_pedido}}/productos/{{id_detalle_2}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "pedidos",
+                "{{id_pedido}}",
+                "productos",
+                "{{id_detalle_2}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "ERROR: renglón que no es de este pedido",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 404\", function () { pm.response.to.have.status(404); });",
+                  "pm.test(\"codigo = DETALLE_NO_EXISTE\", function () { pm.expect(pm.response.json().codigo).to.eql(\"DETALLE_NO_EXISTE\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "X-Usuario-Id",
+                "value": "{{id_mesero}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/pedidos/{{id_pedido}}/productos/99999",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "pedidos",
+                "{{id_pedido}}",
+                "productos",
+                "99999"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cantidad\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Consultas (Read)",
+      "description": "",
+      "item": [
+        {
+          "name": "Ver pedido con sus productos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Usuario-Id",
+                "value": "{{id_mesero}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/pedidos/{{id_pedido}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "pedidos",
+                "{{id_pedido}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Listar mis pedidos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Usuario-Id",
+                "value": "{{id_mesero}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/pedidos",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "pedidos"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Listar mis pedidos PENDIENTES",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Usuario-Id",
+                "value": "{{id_mesero}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/pedidos?estado=PENDIENTE",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "pedidos"
+              ],
+              "query": [
+                {
+                  "key": "estado",
+                  "value": "PENDIENTE"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "ERROR: estado inválido",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 400\", function () { pm.response.to.have.status(400); });",
+                  "pm.test(\"codigo = ESTADO_INVALIDO\", function () { pm.expect(pm.response.json().codigo).to.eql(\"ESTADO_INVALIDO\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Usuario-Id",
+                "value": "{{id_mesero}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/pedidos?estado=XYZ",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "pedidos"
+              ],
+              "query": [
+                {
+                  "key": "estado",
+                  "value": "XYZ"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "ERROR: pedido inexistente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 404\", function () { pm.response.to.have.status(404); });",
+                  "pm.test(\"codigo = PEDIDO_NO_EXISTE\", function () { pm.expect(pm.response.json().codigo).to.eql(\"PEDIDO_NO_EXISTE\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Usuario-Id",
+                "value": "{{id_mesero}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/pedidos/99999",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "pedidos",
+                "99999"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "HU-04 Marcar entregado",
+      "description": "",
+      "item": [
+        {
+          "name": "ERROR: entregar mientras sigue PENDIENTE",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 409\", function () { pm.response.to.have.status(409); });",
+                  "pm.test(\"codigo = TRANSICION_INVALIDA\", function () { pm.expect(pm.response.json().codigo).to.eql(\"TRANSICION_INVALIDA\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "X-Usuario-Id",
+                "value": "{{id_mesero}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/pedidos/{{id_pedido}}/entregar",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "pedidos",
+                "{{id_pedido}}",
+                "entregar"
+              ]
+            },
+            "description": "Solo se puede entregar un pedido LISTO."
+          }
+        },
+        {
+          "name": "PASO MANUAL en MySQL: cocina deja el pedido LISTO (ver descripción)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/salud",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "salud"
+              ]
+            },
+            "description": "Este request no hace nada. Antes del siguiente, ejecuta en MySQL Workbench (reemplaza ID por el id_pedido de las variables):\n\nCALL sp_cocina_iniciar_preparacion(4, ID);\nCALL sp_cocina_marcar_listo(4, ID);"
+          }
+        },
+        {
+          "name": "Marcar entregado (pedido LISTO)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Estado ENTREGADO\", function () { pm.expect(pm.response.json().pedido.estado).to.eql(\"ENTREGADO\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "X-Usuario-Id",
+                "value": "{{id_mesero}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/pedidos/{{id_pedido}}/entregar",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "pedidos",
+                "{{id_pedido}}",
+                "entregar"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "HU-05 Cancelar pedido",
+      "description": "",
+      "item": [
+        {
+          "name": "Preparación: crear otro pedido en la mesa 2",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 201\", function () { pm.response.to.have.status(201); });",
+                  "pm.collectionVariables.set(\"id_pedido_cancelar\", pm.response.json().pedido.id_pedido);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Usuario-Id",
+                "value": "{{id_mesero}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/pedidos",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "pedidos"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id_mesa\": {{id_mesa_2}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Cancelar pedido PENDIENTE",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Estado CANCELADO\", function () { pm.expect(pm.response.json().pedido.estado).to.eql(\"CANCELADO\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "X-Usuario-Id",
+                "value": "{{id_mesero}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/pedidos/{{id_pedido_cancelar}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "pedidos",
+                "{{id_pedido_cancelar}}"
+              ]
+            },
+            "description": "Queda registrado en historial_estado qué usuario canceló y la mesa se libera."
+          }
+        },
+        {
+          "name": "ERROR: cancelar un pedido ya ENTREGADO",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 409\", function () { pm.response.to.have.status(409); });",
+                  "pm.test(\"codigo = CANCELACION_NO_PERMITIDA\", function () { pm.expect(pm.response.json().codigo).to.eql(\"CANCELACION_NO_PERMITIDA\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "X-Usuario-Id",
+                "value": "{{id_mesero}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/pedidos/{{id_pedido}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "pedidos",
+                "{{id_pedido}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "ERROR: cancelar pedido de otro mesero",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 403\", function () { pm.response.to.have.status(403); });",
+                  "pm.test(\"codigo = ACCESO_DENEGADO\", function () { pm.expect(pm.response.json().codigo).to.eql(\"ACCESO_DENEGADO\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "X-Usuario-Id",
+                "value": "{{id_mesero2}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/pedidos/{{id_pedido}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "pedidos",
+                "{{id_pedido}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "ERROR: cancelar pedido inexistente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP 404\", function () { pm.response.to.have.status(404); });",
+                  "pm.test(\"codigo = PEDIDO_NO_EXISTE\", function () { pm.expect(pm.response.json().codigo).to.eql(\"PEDIDO_NO_EXISTE\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "X-Usuario-Id",
+                "value": "{{id_mesero}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/pedidos/99999",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "pedidos",
+                "99999"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

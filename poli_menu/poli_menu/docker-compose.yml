@@ -1,0 +1,14 @@
+# OPCIONAL: levanta un MySQL listo para usar si no tienes uno instalado.
+#   docker compose up -d
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: poli_mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: "12345"
+    ports:
+      - "3306:3306"
+    volumes:
+      - poli_data:/var/lib/mysql
+volumes:
+  poli_data:

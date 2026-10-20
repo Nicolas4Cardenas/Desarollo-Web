@@ -1,7 +1,0 @@
-__pycache__/
-*.py[cod]
-.venv/
-datos/
-respaldos/
-exportaciones/
-config_mysql.json

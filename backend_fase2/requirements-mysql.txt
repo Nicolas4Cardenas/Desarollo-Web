@@ -1,0 +1,2 @@
+# SOLO para el modo MySQL opcional. SQLite no necesita pip.
+mysql-connector-python==26.7.0

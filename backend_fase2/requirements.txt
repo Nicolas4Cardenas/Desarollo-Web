@@ -1,0 +1,2 @@
+# El modo SQLite usa solo la biblioteca estándar de Python. No requiere pip.
+# Solo para MySQL opcional: python -m pip install -r requirements-mysql.txt

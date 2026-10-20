@@ -1,0 +1,3607 @@
+{
+  "info": {
+    "name": "PoliRestaurante · Backend REST · Juan Parra",
+    "description": "API REST con driver SQL, sin frontend. Abre README.md y docs/POSTMAN_VSCODE.md. Configura el entorno e inicia la API antes de enviar. Ejecuta las carpetas 00–08 en orden sobre una base nueva; 01–02 se usan solo para alta inicial. Las operaciones tienen pruebas automáticas y variables de rol separadas.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "00 · Conexión y administrador",
+      "description": "Crea primero el administrador en la terminal. Configura admin_login y admin_password en el entorno; no hay dueño predeterminado.",
+      "item": [
+        {
+          "name": "00.1 Salud",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/salud",
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "const r = pm.response.json();",
+                  "pm.test(\"Respuesta JSON coherente\", function () { pm.expect(r.ok).to.eql(true); });",
+                  "if (pm.response.code < 400) {",
+                  "const d = r.datos;",
+                  "",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "00.2 Login administrador",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/auth/login",
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"login\": \"{{admin_login}}\",\n  \"password\": \"{{admin_password}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "const r = pm.response.json();",
+                  "pm.test(\"Respuesta JSON coherente\", function () { pm.expect(r.ok).to.eql(true); });",
+                  "if (pm.response.code < 400) {",
+                  "const d = r.datos;",
+                  "pm.environment.set(\"token_admin\", d.token); pm.environment.set(\"admin_id\", d.usuario.id); pm.test(\"Rol administrador\", () => pm.expect(d.usuario.rol).to.eql(\"ADMINISTRADOR\"));",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "00.3 Mi perfil",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/auth/me",
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_admin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "const r = pm.response.json();",
+                  "pm.test(\"Respuesta JSON coherente\", function () { pm.expect(r.ok).to.eql(true); });",
+                  "if (pm.response.code < 400) {",
+                  "const d = r.datos;",
+                  "",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "00.4 Cargar catálogo una sola vez",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/admin/datos-iniciales",
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_admin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "const r = pm.response.json();",
+                  "pm.test(\"Respuesta JSON coherente\", function () { pm.expect(r.ok).to.eql(true); });",
+                  "if (pm.response.code < 400) {",
+                  "const d = r.datos;",
+                  "",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "00.5 Categorías iniciales",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/categorias",
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_admin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "const r = pm.response.json();",
+                  "pm.test(\"Respuesta JSON coherente\", function () { pm.expect(r.ok).to.eql(true); });",
+                  "if (pm.response.code < 400) {",
+                  "const d = r.datos;",
+                  "",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "00.6 Productos iniciales",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/productos",
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_admin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "const r = pm.response.json();",
+                  "pm.test(\"Respuesta JSON coherente\", function () { pm.expect(r.ok).to.eql(true); });",
+                  "if (pm.response.code < 400) {",
+                  "const d = r.datos;",
+                  "const a = d.find(x => x.nombre === \"Hamburguesa de la casa\"); const b = d.find(x => x.nombre === \"Agua\"); pm.expect(a).to.be.an(\"object\"); pm.expect(b).to.be.an(\"object\"); pm.environment.set(\"producto_id\",a.id); pm.environment.set(\"producto_extra_id\",b.id); pm.environment.set(\"categoria_id\",a.categoria_id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "00.7 Mesas libres",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/mesas",
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_admin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "const r = pm.response.json();",
+                  "pm.test(\"Respuesta JSON coherente\", function () { pm.expect(r.ok).to.eql(true); });",
+                  "if (pm.response.code < 400) {",
+                  "const d = r.datos;",
+                  "const m = d.find(x => x.estado === \"LIBRE\"); pm.expect(m).to.be.an(\"object\"); pm.environment.set(\"mesa_id\",m.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "01 · Crear empleados (solo la primera vez)",
+      "description": "Ejecutar una vez por base. Cambia los logins del entorno si ya existen. Las contraseñas incluidas son solo ejemplos para clase.",
+      "item": [
+        {
+          "name": "01.1 Crear mesero Juan",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/usuarios",
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_admin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Juan Parra\",\n  \"login\": \"{{mesero_login}}\",\n  \"rol\": \"MESERO\",\n  \"password\": \"{{mesero_temporal}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", function () { pm.response.to.have.status(201); });",
+                  "const r = pm.response.json();",
+                  "pm.test(\"Respuesta JSON coherente\", function () { pm.expect(r.ok).to.eql(true); });",
+                  "if (pm.response.code < 400) {",
+                  "const d = r.datos;",
+                  "pm.environment.set(\"mesero_id\",d.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "01.2 Crear cocinero",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/usuarios",
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_admin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Cocina de presentación\",\n  \"login\": \"{{cocina_login}}\",\n  \"rol\": \"COCINA\",\n  \"password\": \"{{cocina_temporal}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", function () { pm.response.to.have.status(201); });",
+                  "const r = pm.response.json();",
+                  "pm.test(\"Respuesta JSON coherente\", function () { pm.expect(r.ok).to.eql(true); });",
+                  "if (pm.response.code < 400) {",
+                  "const d = r.datos;",
+                  "pm.environment.set(\"cocina_id\",d.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "01.3 Listar usuarios",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/usuarios",
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_admin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "const r = pm.response.json();",
+                  "pm.test(\"Respuesta JSON coherente\", function () { pm.expect(r.ok).to.eql(true); });",
+                  "if (pm.response.code < 400) {",
+                  "const d = r.datos;",
+                  "",
+                  "}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "02 · Activar empleados (solo la primera vez)",
+      "description": "Cambiar la contraseña revoca el token temporal. Cada rol vuelve a iniciar sesión con su contraseña nueva.",
+      "item": [
+        {
+          "name": "02.1 Login temporal mesero",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/auth/login",
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"login\": \"{{mesero_login}}\",\n  \"password\": \"{{mesero_temporal}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "const r = pm.response.json();",
+                  "pm.test(\"Respuesta JSON coherente\", function () { pm.expect(r.ok).to.eql(true); });",
+                  "if (pm.response.code < 400) {",
+                  "const d = r.datos;",
+                  "pm.environment.set(\"token_mesero\",d.token);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "02.2 Cambiar contraseña mesero",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/auth/password",
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_mesero}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"actual\": \"{{mesero_temporal}}\",\n  \"nueva\": \"{{mesero_password}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "const r = pm.response.json();",
+                  "pm.test(\"Respuesta JSON coherente\", function () { pm.expect(r.ok).to.eql(true); });",
+                  "if (pm.response.code < 400) {",
+                  "const d = r.datos;",
+                  "",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "02.3 Login definitivo mesero",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/auth/login",
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"login\": \"{{mesero_login}}\",\n  \"password\": \"{{mesero_password}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "const r = pm.response.json();",
+                  "pm.test(\"Respuesta JSON coherente\", function () { pm.expect(r.ok).to.eql(true); });",
+                  "if (pm.response.code < 400) {",
+                  "const d = r.datos;",
+                  "pm.environment.set(\"token_mesero\",d.token);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "02.4 Perfil mesero",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/auth/me",
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_mesero}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "const r = pm.response.json();",
+                  "pm.test(\"Respuesta JSON coherente\", function () { pm.expect(r.ok).to.eql(true); });",
+                  "if (pm.response.code < 400) {",
+                  "const d = r.datos;",
+                  "",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "02.5 Login temporal cocina",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/auth/login",
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"login\": \"{{cocina_login}}\",\n  \"password\": \"{{cocina_temporal}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "const r = pm.response.json();",
+                  "pm.test(\"Respuesta JSON coherente\", function () { pm.expect(r.ok).to.eql(true); });",
+                  "if (pm.response.code < 400) {",
+                  "const d = r.datos;",
+                  "pm.environment.set(\"token_cocina\",d.token);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "02.6 Cambiar contraseña cocina",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/auth/password",
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_cocina}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"actual\": \"{{cocina_temporal}}\",\n  \"nueva\": \"{{cocina_password}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "const r = pm.response.json();",
+                  "pm.test(\"Respuesta JSON coherente\", function () { pm.expect(r.ok).to.eql(true); });",
+                  "if (pm.response.code < 400) {",
+                  "const d = r.datos;",
+                  "",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "02.7 Login definitivo cocina",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/auth/login",
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"login\": \"{{cocina_login}}\",\n  \"password\": \"{{cocina_password}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "const r = pm.response.json();",
+                  "pm.test(\"Respuesta JSON coherente\", function () { pm.expect(r.ok).to.eql(true); });",
+                  "if (pm.response.code < 400) {",
+                  "const d = r.datos;",
+                  "pm.environment.set(\"token_cocina\",d.token);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "02.8 Perfil cocina",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/auth/me",
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_cocina}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "const r = pm.response.json();",
+                  "pm.test(\"Respuesta JSON coherente\", function () { pm.expect(r.ok).to.eql(true); });",
+                  "if (pm.response.code < 400) {",
+                  "const d = r.datos;",
+                  "",
+                  "}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "03 · CRUD de administración",
+      "description": "Categoría, producto, mesa y usuario auxiliares para demostrar crear, consultar, editar y borrar/archivar sin tocar el catálogo inicial.",
+      "item": [
+        {
+          "name": "03.1 Crear categoría auxiliar",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/categorias",
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_admin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Prueba {{sufijo}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", function () { pm.response.to.have.status(201); });",
+                  "const r = pm.response.json();",
+                  "pm.test(\"Respuesta JSON coherente\", function () { pm.expect(r.ok).to.eql(true); });",
+                  "if (pm.response.code < 400) {",
+                  "const d = r.datos;",
+                  "pm.environment.set(\"crud_categoria_id\",d.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "03.2 Consultar categoría",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/categorias/{{crud_categoria_id}}",
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_admin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "const r = pm.response.json();",
+                  "pm.test(\"Respuesta JSON coherente\", function () { pm.expect(r.ok).to.eql(true); });",
+                  "if (pm.response.code < 400) {",
+                  "const d = r.datos;",
+                  "",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "03.3 Editar categoría",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/categorias/{{crud_categoria_id}}",
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_admin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Especiales {{sufijo}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "const r = pm.response.json();",
+                  "pm.test(\"Respuesta JSON coherente\", function () { pm.expect(r.ok).to.eql(true); });",
+                  "if (pm.response.code < 400) {",
+                  "const d = r.datos;",
+                  "",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "03.4 Crear producto auxiliar",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/productos",
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_admin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"nombre\":\"Producto de prueba {{sufijo}}\",\"descripcion\":\"CRUD para clase\",\"precio\":\"12000.00\",\"categoria_id\":{{crud_categoria_id}}}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", function () { pm.response.to.have.status(201); });",
+                  "const r = pm.response.json();",
+                  "pm.test(\"Respuesta JSON coherente\", function () { pm.expect(r.ok).to.eql(true); });",
+                  "if (pm.response.code < 400) {",
+                  "const d = r.datos;",
+                  "pm.environment.set(\"crud_producto_id\",d.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "03.5 Consultar producto",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/productos/{{crud_producto_id}}",
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_admin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "const r = pm.response.json();",
+                  "pm.test(\"Respuesta JSON coherente\", function () { pm.expect(r.ok).to.eql(true); });",
+                  "if (pm.response.code < 400) {",
+                  "const d = r.datos;",
+                  "",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "03.6 Editar producto",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/productos/{{crud_producto_id}}",
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_admin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"nombre\":\"Producto editado {{sufijo}}\",\"descripcion\":\"Precio actualizado\",\"precio\":\"13000.00\",\"categoria_id\":{{categoria_id}},\"disponible\":true,\"activo\":true}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "const r = pm.response.json();",
+                  "pm.test(\"Respuesta JSON coherente\", function () { pm.expect(r.ok).to.eql(true); });",
+                  "if (pm.response.code < 400) {",
+                  "const d = r.datos;",
+                  "",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "03.7 Archivar producto",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{base_url}}/productos/{{crud_producto_id}}",
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_admin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "const r = pm.response.json();",
+                  "pm.test(\"Respuesta JSON coherente\", function () { pm.expect(r.ok).to.eql(true); });",
+                  "if (pm.response.code < 400) {",
+                  "const d = r.datos;",
+                  "",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "03.8 Eliminar categoría ya vacía",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{base_url}}/categorias/{{crud_categoria_id}}",
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_admin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "const r = pm.response.json();",
+                  "pm.test(\"Respuesta JSON coherente\", function () { pm.expect(r.ok).to.eql(true); });",
+                  "if (pm.response.code < 400) {",
+                  "const d = r.datos;",
+                  "",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "03.9 Crear mesa auxiliar",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/mesas",
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_admin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"numero\":{{mesa_prueba_numero}},\"capacidad\":4}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", function () { pm.response.to.have.status(201); });",
+                  "const r = pm.response.json();",
+                  "pm.test(\"Respuesta JSON coherente\", function () { pm.expect(r.ok).to.eql(true); });",
+                  "if (pm.response.code < 400) {",
+                  "const d = r.datos;",
+                  "pm.environment.set(\"crud_mesa_id\",d.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "03.10 Consultar mesa",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/mesas/{{crud_mesa_id}}",
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_admin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "const r = pm.response.json();",
+                  "pm.test(\"Respuesta JSON coherente\", function () { pm.expect(r.ok).to.eql(true); });",
+                  "if (pm.response.code < 400) {",
+                  "const d = r.datos;",
+                  "",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "03.11 Editar mesa",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/mesas/{{crud_mesa_id}}",
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_admin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"numero\":{{mesa_prueba_numero}},\"capacidad\":6,\"activa\":true}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "const r = pm.response.json();",
+                  "pm.test(\"Respuesta JSON coherente\", function () { pm.expect(r.ok).to.eql(true); });",
+                  "if (pm.response.code < 400) {",
+                  "const d = r.datos;",
+                  "",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "03.12 Archivar mesa",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{base_url}}/mesas/{{crud_mesa_id}}",
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_admin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "const r = pm.response.json();",
+                  "pm.test(\"Respuesta JSON coherente\", function () { pm.expect(r.ok).to.eql(true); });",
+                  "if (pm.response.code < 400) {",
+                  "const d = r.datos;",
+                  "",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "03.13 Crear usuario auxiliar",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/usuarios",
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_admin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Empleado auxiliar\",\n  \"login\": \"aux_{{sufijo}}\",\n  \"rol\": \"MESERO\",\n  \"password\": \"TemporalAux123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", function () { pm.response.to.have.status(201); });",
+                  "const r = pm.response.json();",
+                  "pm.test(\"Respuesta JSON coherente\", function () { pm.expect(r.ok).to.eql(true); });",
+                  "if (pm.response.code < 400) {",
+                  "const d = r.datos;",
+                  "pm.environment.set(\"crud_usuario_id\",d.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "03.14 Consultar usuario",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/usuarios/{{crud_usuario_id}}",
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_admin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "const r = pm.response.json();",
+                  "pm.test(\"Respuesta JSON coherente\", function () { pm.expect(r.ok).to.eql(true); });",
+                  "if (pm.response.code < 400) {",
+                  "const d = r.datos;",
+                  "",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "03.15 Editar usuario",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/usuarios/{{crud_usuario_id}}",
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_admin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Empleado auxiliar editado\",\n  \"login\": \"aux_{{sufijo}}\",\n  \"rol\": \"COCINA\",\n  \"activo\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "const r = pm.response.json();",
+                  "pm.test(\"Respuesta JSON coherente\", function () { pm.expect(r.ok).to.eql(true); });",
+                  "if (pm.response.code < 400) {",
+                  "const d = r.datos;",
+                  "",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "03.16 Desactivar usuario",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{base_url}}/usuarios/{{crud_usuario_id}}",
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_admin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "const r = pm.response.json();",
+                  "pm.test(\"Respuesta JSON coherente\", function () { pm.expect(r.ok).to.eql(true); });",
+                  "if (pm.response.code < 400) {",
+                  "const d = r.datos;",
+                  "",
+                  "}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "04 · Pruebas de permisos",
+      "description": "Estos errores son esperados y demuestran que el servidor aplica permisos.",
+      "item": [
+        {
+          "name": "04.1 Sin token devuelve 401",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/usuarios",
+            "description": "",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 401\", function () { pm.response.to.have.status(401); });",
+                  "const r = pm.response.json();",
+                  "pm.test(\"Respuesta JSON coherente\", function () { pm.expect(r.ok).to.eql(false); });",
+                  "if (pm.response.code < 400) {",
+                  "const d = r.datos;",
+                  "",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "04.2 Mesero no crea categorías",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/categorias",
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_mesero}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Prohibida\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 403\", function () { pm.response.to.have.status(403); });",
+                  "const r = pm.response.json();",
+                  "pm.test(\"Respuesta JSON coherente\", function () { pm.expect(r.ok).to.eql(false); });",
+                  "if (pm.response.code < 400) {",
+                  "const d = r.datos;",
+                  "",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "04.3 Cocina no crea pedidos",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{clave_operacion}}"
+              }
+            ],
+            "url": "{{base_url}}/pedidos",
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_cocina}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipo\": \"LLEVAR\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const k = 'pendiente_' + pm.info.requestName;",
+                  "let v = pm.environment.get(k);",
+                  "if (!v) { v = pm.variables.replaceIn('{{$guid}}'); pm.environment.set(k, v); }",
+                  "pm.variables.set('clave_operacion', v);",
+                  "pm.environment.set('ultima_clave', v);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 403\", function () { pm.response.to.have.status(403); });",
+                  "const r = pm.response.json();",
+                  "pm.test(\"Respuesta JSON coherente\", function () { pm.expect(r.ok).to.eql(false); });",
+                  "if (pm.response.code < 400) {",
+                  "const d = r.datos;",
+                  "",
+                  "}",
+                  "",
+                  "if (pm.response.code < 500) { pm.environment.unset(\"pendiente_\" + pm.info.requestName); }"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "04.4 Mesero no consulta ventas",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/reportes/ventas?desde={{desde}}&hasta={{hasta}}",
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_mesero}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 403\", function () { pm.response.to.have.status(403); });",
+                  "const r = pm.response.json();",
+                  "pm.test(\"Respuesta JSON coherente\", function () { pm.expect(r.ok).to.eql(false); });",
+                  "if (pm.response.code < 400) {",
+                  "const d = r.datos;",
+                  "",
+                  "}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "05 · Juan HU01–HU04 y cocina",
+      "description": "Ejecutar en orden. Las respuestas guardan pedido_id y version. GET de detalles guarda los IDs reales, sin asumir que empiezan en 1.",
+      "item": [
+        {
+          "name": "05.1 HU01 Crear pedido salón",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{clave_operacion}}"
+              }
+            ],
+            "url": "{{base_url}}/pedidos",
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_mesero}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"tipo\":\"SALON\",\"mesa_id\":{{mesa_id}}}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const k = 'pendiente_' + pm.info.requestName;",
+                  "let v = pm.environment.get(k);",
+                  "if (!v) { v = pm.variables.replaceIn('{{$guid}}'); pm.environment.set(k, v); }",
+                  "pm.variables.set('clave_operacion', v);",
+                  "pm.environment.set('ultima_clave', v);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", function () { pm.response.to.have.status(201); });",
+                  "const r = pm.response.json();",
+                  "pm.test(\"Respuesta JSON coherente\", function () { pm.expect(r.ok).to.eql(true); });",
+                  "if (pm.response.code < 400) {",
+                  "const d = r.datos;",
+                  "pm.environment.set(\"pedido_id\", d.id); pm.environment.set(\"version\", d.version);",
+                  "}",
+                  "",
+                  "if (pm.response.code < 500) { pm.environment.unset(\"pendiente_\" + pm.info.requestName); }"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "05.2 Mesa ocupada devuelve 409",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{clave_operacion}}"
+              }
+            ],
+            "url": "{{base_url}}/pedidos",
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_mesero}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"tipo\":\"SALON\",\"mesa_id\":{{mesa_id}}}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const k = 'pendiente_' + pm.info.requestName;",
+                  "let v = pm.environment.get(k);",
+                  "if (!v) { v = pm.variables.replaceIn('{{$guid}}'); pm.environment.set(k, v); }",
+                  "pm.variables.set('clave_operacion', v);",
+                  "pm.environment.set('ultima_clave', v);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 409\", function () { pm.response.to.have.status(409); });",
+                  "const r = pm.response.json();",
+                  "pm.test(\"Respuesta JSON coherente\", function () { pm.expect(r.ok).to.eql(false); });",
+                  "if (pm.response.code < 400) {",
+                  "const d = r.datos;",
+                  "",
+                  "}",
+                  "",
+                  "if (pm.response.code < 500) { pm.environment.unset(\"pendiente_\" + pm.info.requestName); }"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "05.3 HU02 Agregar hamburguesas",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{clave_operacion}}"
+              }
+            ],
+            "url": "{{base_url}}/pedidos/{{pedido_id}}/detalles",
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_mesero}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"producto_id\":{{producto_id}},\"cantidad\":2,\"notas\":\"Sin cebolla\",\"version\":{{version}}}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const k = 'pendiente_' + pm.info.requestName;",
+                  "let v = pm.environment.get(k);",
+                  "if (!v) { v = pm.variables.replaceIn('{{$guid}}'); pm.environment.set(k, v); }",
+                  "pm.variables.set('clave_operacion', v);",
+                  "pm.environment.set('ultima_clave', v);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", function () { pm.response.to.have.status(201); });",
+                  "const r = pm.response.json();",
+                  "pm.test(\"Respuesta JSON coherente\", function () { pm.expect(r.ok).to.eql(true); });",
+                  "if (pm.response.code < 400) {",
+                  "const d = r.datos;",
+                  "pm.environment.set(\"version\", d.version);",
+                  "}",
+                  "",
+                  "if (pm.response.code < 500) { pm.environment.unset(\"pendiente_\" + pm.info.requestName); }"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "05.4 HU02 Agregar agua",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{clave_operacion}}"
+              }
+            ],
+            "url": "{{base_url}}/pedidos/{{pedido_id}}/detalles",
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_mesero}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"producto_id\":{{producto_extra_id}},\"cantidad\":1,\"notas\":\"Sin hielo\",\"version\":{{version}}}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const k = 'pendiente_' + pm.info.requestName;",
+                  "let v = pm.environment.get(k);",
+                  "if (!v) { v = pm.variables.replaceIn('{{$guid}}'); pm.environment.set(k, v); }",
+                  "pm.variables.set('clave_operacion', v);",
+                  "pm.environment.set('ultima_clave', v);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", function () { pm.response.to.have.status(201); });",
+                  "const r = pm.response.json();",
+                  "pm.test(\"Respuesta JSON coherente\", function () { pm.expect(r.ok).to.eql(true); });",
+                  "if (pm.response.code < 400) {",
+                  "const d = r.datos;",
+                  "pm.environment.set(\"version\", d.version);",
+                  "}",
+                  "",
+                  "if (pm.response.code < 500) { pm.environment.unset(\"pendiente_\" + pm.info.requestName); }"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "05.5 Consultar pedido y líneas",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/pedidos/{{pedido_id}}",
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_mesero}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "const r = pm.response.json();",
+                  "pm.test(\"Respuesta JSON coherente\", function () { pm.expect(r.ok).to.eql(true); });",
+                  "if (pm.response.code < 400) {",
+                  "const d = r.datos;",
+                  "pm.environment.set(\"version\",d.version); pm.environment.set(\"detalle_id\",d.detalles[0].id); pm.environment.set(\"detalle_quitar_id\",d.detalles[1].id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "05.6 HU03 Editar cantidad y notas",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{clave_operacion}}"
+              }
+            ],
+            "url": "{{base_url}}/pedidos/{{pedido_id}}/detalles/{{detalle_id}}",
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_mesero}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"cantidad\":3,\"notas\":\"Sin sal\",\"version\":{{version}}}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const k = 'pendiente_' + pm.info.requestName;",
+                  "let v = pm.environment.get(k);",
+                  "if (!v) { v = pm.variables.replaceIn('{{$guid}}'); pm.environment.set(k, v); }",
+                  "pm.variables.set('clave_operacion', v);",
+                  "pm.environment.set('ultima_clave', v);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "const r = pm.response.json();",
+                  "pm.test(\"Respuesta JSON coherente\", function () { pm.expect(r.ok).to.eql(true); });",
+                  "if (pm.response.code < 400) {",
+                  "const d = r.datos;",
+                  "pm.environment.set(\"version\", d.version);",
+                  "}",
+                  "",
+                  "if (pm.response.code < 500) { pm.environment.unset(\"pendiente_\" + pm.info.requestName); }"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "05.7 HU03 Quitar agua",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Idempotency-Key",
+                "value": "{{clave_operacion}}"
+              }
+            ],
+            "url": "{{base_url}}/pedidos/{{pedido_id}}/detalles/{{detalle_quitar_id}}?version={{version}}",
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_mesero}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const k = 'pendiente_' + pm.info.requestName;",
+                  "let v = pm.environment.get(k);",
+                  "if (!v) { v = pm.variables.replaceIn('{{$guid}}'); pm.environment.set(k, v); }",
+                  "pm.variables.set('clave_operacion', v);",
+                  "pm.environment.set('ultima_clave', v);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "const r = pm.response.json();",
+                  "pm.test(\"Respuesta JSON coherente\", function () { pm.expect(r.ok).to.eql(true); });",
+                  "if (pm.response.code < 400) {",
+                  "const d = r.datos;",
+                  "pm.environment.set(\"version\", d.version);",
+                  "}",
+                  "",
+                  "if (pm.response.code < 500) { pm.environment.unset(\"pendiente_\" + pm.info.requestName); }"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "05.8 Versión obsoleta devuelve 409",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{clave_operacion}}"
+              }
+            ],
+            "url": "{{base_url}}/pedidos/{{pedido_id}}/detalles",
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_mesero}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"producto_id\":{{producto_id}},\"cantidad\":1,\"version\":1}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const k = 'pendiente_' + pm.info.requestName;",
+                  "let v = pm.environment.get(k);",
+                  "if (!v) { v = pm.variables.replaceIn('{{$guid}}'); pm.environment.set(k, v); }",
+                  "pm.variables.set('clave_operacion', v);",
+                  "pm.environment.set('ultima_clave', v);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 409\", function () { pm.response.to.have.status(409); });",
+                  "const r = pm.response.json();",
+                  "pm.test(\"Respuesta JSON coherente\", function () { pm.expect(r.ok).to.eql(false); });",
+                  "if (pm.response.code < 400) {",
+                  "const d = r.datos;",
+                  "",
+                  "}",
+                  "",
+                  "if (pm.response.code < 500) { pm.environment.unset(\"pendiente_\" + pm.info.requestName); }"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "05.9 Cocina consulta cola FIFO",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/cocina/cola",
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_cocina}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "const r = pm.response.json();",
+                  "pm.test(\"Respuesta JSON coherente\", function () { pm.expect(r.ok).to.eql(true); });",
+                  "if (pm.response.code < 400) {",
+                  "const d = r.datos;",
+                  "",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "05.10 Cocina inicia preparación",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{clave_operacion}}"
+              }
+            ],
+            "url": "{{base_url}}/pedidos/{{pedido_id}}/estado",
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_cocina}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"estado\":\"EN_PREPARACION\",\"version\":{{version}}}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const k = 'pendiente_' + pm.info.requestName;",
+                  "let v = pm.environment.get(k);",
+                  "if (!v) { v = pm.variables.replaceIn('{{$guid}}'); pm.environment.set(k, v); }",
+                  "pm.variables.set('clave_operacion', v);",
+                  "pm.environment.set('ultima_clave', v);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "const r = pm.response.json();",
+                  "pm.test(\"Respuesta JSON coherente\", function () { pm.expect(r.ok).to.eql(true); });",
+                  "if (pm.response.code < 400) {",
+                  "const d = r.datos;",
+                  "pm.environment.set(\"version\", d.version);",
+                  "}",
+                  "",
+                  "if (pm.response.code < 500) { pm.environment.unset(\"pendiente_\" + pm.info.requestName); }"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "05.11 Ya no se edita en preparación",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{clave_operacion}}"
+              }
+            ],
+            "url": "{{base_url}}/pedidos/{{pedido_id}}/detalles/{{detalle_id}}",
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_mesero}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"cantidad\":1,\"notas\":\"Tarde\",\"version\":{{version}}}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const k = 'pendiente_' + pm.info.requestName;",
+                  "let v = pm.environment.get(k);",
+                  "if (!v) { v = pm.variables.replaceIn('{{$guid}}'); pm.environment.set(k, v); }",
+                  "pm.variables.set('clave_operacion', v);",
+                  "pm.environment.set('ultima_clave', v);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 409\", function () { pm.response.to.have.status(409); });",
+                  "const r = pm.response.json();",
+                  "pm.test(\"Respuesta JSON coherente\", function () { pm.expect(r.ok).to.eql(false); });",
+                  "if (pm.response.code < 400) {",
+                  "const d = r.datos;",
+                  "",
+                  "}",
+                  "",
+                  "if (pm.response.code < 500) { pm.environment.unset(\"pendiente_\" + pm.info.requestName); }"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "05.12 Cocina marca listo",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{clave_operacion}}"
+              }
+            ],
+            "url": "{{base_url}}/pedidos/{{pedido_id}}/estado",
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_cocina}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"estado\":\"LISTO\",\"version\":{{version}}}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const k = 'pendiente_' + pm.info.requestName;",
+                  "let v = pm.environment.get(k);",
+                  "if (!v) { v = pm.variables.replaceIn('{{$guid}}'); pm.environment.set(k, v); }",
+                  "pm.variables.set('clave_operacion', v);",
+                  "pm.environment.set('ultima_clave', v);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "const r = pm.response.json();",
+                  "pm.test(\"Respuesta JSON coherente\", function () { pm.expect(r.ok).to.eql(true); });",
+                  "if (pm.response.code < 400) {",
+                  "const d = r.datos;",
+                  "pm.environment.set(\"version\", d.version);",
+                  "}",
+                  "",
+                  "if (pm.response.code < 500) { pm.environment.unset(\"pendiente_\" + pm.info.requestName); }"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "05.13 HU04 Mesero entrega",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{clave_operacion}}"
+              }
+            ],
+            "url": "{{base_url}}/pedidos/{{pedido_id}}/estado",
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_mesero}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"estado\":\"ENTREGADO\",\"version\":{{version}}}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const k = 'pendiente_' + pm.info.requestName;",
+                  "let v = pm.environment.get(k);",
+                  "if (!v) { v = pm.variables.replaceIn('{{$guid}}'); pm.environment.set(k, v); }",
+                  "pm.variables.set('clave_operacion', v);",
+                  "pm.environment.set('ultima_clave', v);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "const r = pm.response.json();",
+                  "pm.test(\"Respuesta JSON coherente\", function () { pm.expect(r.ok).to.eql(true); });",
+                  "if (pm.response.code < 400) {",
+                  "const d = r.datos;",
+                  "pm.environment.set(\"version\", d.version);",
+                  "}",
+                  "",
+                  "if (pm.response.code < 500) { pm.environment.unset(\"pendiente_\" + pm.info.requestName); }"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "05.14 Ver total e historial",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/pedidos/{{pedido_id}}",
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_mesero}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "const r = pm.response.json();",
+                  "pm.test(\"Respuesta JSON coherente\", function () { pm.expect(r.ok).to.eql(true); });",
+                  "if (pm.response.code < 400) {",
+                  "const d = r.datos;",
+                  "pm.test(\"Total correcto COP 66000\", () => pm.expect(d.total_centavos).to.eql(6600000)); pm.test(\"Pedido entregado\", () => pm.expect(d.estado).to.eql(\"ENTREGADO\")); pm.test(\"Cuatro estados trazados\", () => pm.expect(d.historial.length).to.eql(4));",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "05.15 Consultar última operación confirmada",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/operaciones/{{ultima_clave}}",
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_mesero}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "const r = pm.response.json();",
+                  "pm.test(\"Respuesta JSON coherente\", function () { pm.expect(r.ok).to.eql(true); });",
+                  "if (pm.response.code < 400) {",
+                  "const d = r.datos;",
+                  "",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "05.16 Mesa liberada",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/mesas/{{mesa_id}}",
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_mesero}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "const r = pm.response.json();",
+                  "pm.test(\"Respuesta JSON coherente\", function () { pm.expect(r.ok).to.eql(true); });",
+                  "if (pm.response.code < 400) {",
+                  "const d = r.datos;",
+                  "pm.test(\"Mesa libre\", () => pm.expect(d.estado).to.eql(\"LIBRE\"));",
+                  "}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "06 · Juan HU05 Cancelar",
+      "description": "Nuevo pedido independiente. Cancelar conserva historial, exige motivo y libera la mesa.",
+      "item": [
+        {
+          "name": "06.1 Crear otro pedido",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{clave_operacion}}"
+              }
+            ],
+            "url": "{{base_url}}/pedidos",
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_mesero}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"tipo\":\"SALON\",\"mesa_id\":{{mesa_id}}}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const k = 'pendiente_' + pm.info.requestName;",
+                  "let v = pm.environment.get(k);",
+                  "if (!v) { v = pm.variables.replaceIn('{{$guid}}'); pm.environment.set(k, v); }",
+                  "pm.variables.set('clave_operacion', v);",
+                  "pm.environment.set('ultima_clave', v);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", function () { pm.response.to.have.status(201); });",
+                  "const r = pm.response.json();",
+                  "pm.test(\"Respuesta JSON coherente\", function () { pm.expect(r.ok).to.eql(true); });",
+                  "if (pm.response.code < 400) {",
+                  "const d = r.datos;",
+                  "pm.environment.set(\"pedido_id\", d.id); pm.environment.set(\"version\", d.version);",
+                  "}",
+                  "",
+                  "if (pm.response.code < 500) { pm.environment.unset(\"pendiente_\" + pm.info.requestName); }"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "06.2 Agregar un producto",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{clave_operacion}}"
+              }
+            ],
+            "url": "{{base_url}}/pedidos/{{pedido_id}}/detalles",
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_mesero}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"producto_id\":{{producto_id}},\"cantidad\":1,\"version\":{{version}}}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const k = 'pendiente_' + pm.info.requestName;",
+                  "let v = pm.environment.get(k);",
+                  "if (!v) { v = pm.variables.replaceIn('{{$guid}}'); pm.environment.set(k, v); }",
+                  "pm.variables.set('clave_operacion', v);",
+                  "pm.environment.set('ultima_clave', v);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", function () { pm.response.to.have.status(201); });",
+                  "const r = pm.response.json();",
+                  "pm.test(\"Respuesta JSON coherente\", function () { pm.expect(r.ok).to.eql(true); });",
+                  "if (pm.response.code < 400) {",
+                  "const d = r.datos;",
+                  "pm.environment.set(\"version\", d.version);",
+                  "}",
+                  "",
+                  "if (pm.response.code < 500) { pm.environment.unset(\"pendiente_\" + pm.info.requestName); }"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "06.3 Cancelar sin motivo falla",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{clave_operacion}}"
+              }
+            ],
+            "url": "{{base_url}}/pedidos/{{pedido_id}}/estado",
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_mesero}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"estado\":\"CANCELADO\",\"version\":{{version}}}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const k = 'pendiente_' + pm.info.requestName;",
+                  "let v = pm.environment.get(k);",
+                  "if (!v) { v = pm.variables.replaceIn('{{$guid}}'); pm.environment.set(k, v); }",
+                  "pm.variables.set('clave_operacion', v);",
+                  "pm.environment.set('ultima_clave', v);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 422\", function () { pm.response.to.have.status(422); });",
+                  "const r = pm.response.json();",
+                  "pm.test(\"Respuesta JSON coherente\", function () { pm.expect(r.ok).to.eql(false); });",
+                  "if (pm.response.code < 400) {",
+                  "const d = r.datos;",
+                  "",
+                  "}",
+                  "",
+                  "if (pm.response.code < 500) { pm.environment.unset(\"pendiente_\" + pm.info.requestName); }"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "06.4 Cancelar con motivo",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{clave_operacion}}"
+              }
+            ],
+            "url": "{{base_url}}/pedidos/{{pedido_id}}/estado",
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_mesero}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"estado\":\"CANCELADO\",\"version\":{{version}},\"motivo\":\"El cliente decidió retirarse\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const k = 'pendiente_' + pm.info.requestName;",
+                  "let v = pm.environment.get(k);",
+                  "if (!v) { v = pm.variables.replaceIn('{{$guid}}'); pm.environment.set(k, v); }",
+                  "pm.variables.set('clave_operacion', v);",
+                  "pm.environment.set('ultima_clave', v);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "const r = pm.response.json();",
+                  "pm.test(\"Respuesta JSON coherente\", function () { pm.expect(r.ok).to.eql(true); });",
+                  "if (pm.response.code < 400) {",
+                  "const d = r.datos;",
+                  "pm.environment.set(\"version\", d.version);",
+                  "}",
+                  "",
+                  "if (pm.response.code < 500) { pm.environment.unset(\"pendiente_\" + pm.info.requestName); }"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "06.5 Consultar cancelación e historial",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/pedidos/{{pedido_id}}",
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_mesero}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "const r = pm.response.json();",
+                  "pm.test(\"Respuesta JSON coherente\", function () { pm.expect(r.ok).to.eql(true); });",
+                  "if (pm.response.code < 400) {",
+                  "const d = r.datos;",
+                  "pm.test(\"Cancelado\", () => pm.expect(d.estado).to.eql(\"CANCELADO\"));",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "06.6 Mesa nuevamente libre",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/mesas/{{mesa_id}}",
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_mesero}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "const r = pm.response.json();",
+                  "pm.test(\"Respuesta JSON coherente\", function () { pm.expect(r.ok).to.eql(true); });",
+                  "if (pm.response.code < 400) {",
+                  "const d = r.datos;",
+                  "pm.test(\"Mesa libre\", () => pm.expect(d.estado).to.eql(\"LIBRE\"));",
+                  "}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "07 · Control del administrador y reportes",
+      "description": "El administrador puede asignar responsables e intervenir; respeta estados y conserva auditoría. Fechas del entorno en UTC.",
+      "item": [
+        {
+          "name": "07.1 Crear pedido para mesero",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{clave_operacion}}"
+              }
+            ],
+            "url": "{{base_url}}/pedidos",
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_admin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"tipo\":\"LLEVAR\",\"responsable_id\":{{mesero_id}}}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const k = 'pendiente_' + pm.info.requestName;",
+                  "let v = pm.environment.get(k);",
+                  "if (!v) { v = pm.variables.replaceIn('{{$guid}}'); pm.environment.set(k, v); }",
+                  "pm.variables.set('clave_operacion', v);",
+                  "pm.environment.set('ultima_clave', v);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 201\", function () { pm.response.to.have.status(201); });",
+                  "const r = pm.response.json();",
+                  "pm.test(\"Respuesta JSON coherente\", function () { pm.expect(r.ok).to.eql(true); });",
+                  "if (pm.response.code < 400) {",
+                  "const d = r.datos;",
+                  "pm.environment.set(\"pedido_id\", d.id); pm.environment.set(\"version\", d.version);",
+                  "}",
+                  "",
+                  "if (pm.response.code < 500) { pm.environment.unset(\"pendiente_\" + pm.info.requestName); }"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "07.2 Reasignar responsable al dueño",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{clave_operacion}}"
+              }
+            ],
+            "url": "{{base_url}}/pedidos/{{pedido_id}}/asignacion",
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_admin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"responsable_id\":{{admin_id}},\"version\":{{version}},\"motivo\":\"Cambio de turno\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const k = 'pendiente_' + pm.info.requestName;",
+                  "let v = pm.environment.get(k);",
+                  "if (!v) { v = pm.variables.replaceIn('{{$guid}}'); pm.environment.set(k, v); }",
+                  "pm.variables.set('clave_operacion', v);",
+                  "pm.environment.set('ultima_clave', v);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "const r = pm.response.json();",
+                  "pm.test(\"Respuesta JSON coherente\", function () { pm.expect(r.ok).to.eql(true); });",
+                  "if (pm.response.code < 400) {",
+                  "const d = r.datos;",
+                  "pm.environment.set(\"version\", d.version);",
+                  "}",
+                  "",
+                  "if (pm.response.code < 500) { pm.environment.unset(\"pendiente_\" + pm.info.requestName); }"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "07.3 Mesero anterior pierde acceso",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/pedidos/{{pedido_id}}",
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_mesero}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 403\", function () { pm.response.to.have.status(403); });",
+                  "const r = pm.response.json();",
+                  "pm.test(\"Respuesta JSON coherente\", function () { pm.expect(r.ok).to.eql(false); });",
+                  "if (pm.response.code < 400) {",
+                  "const d = r.datos;",
+                  "",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "07.4 Dueño cierra pedido reasignado",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{clave_operacion}}"
+              }
+            ],
+            "url": "{{base_url}}/pedidos/{{pedido_id}}/estado",
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_admin}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"estado\":\"CANCELADO\",\"version\":{{version}},\"motivo\":\"Fin de demostración\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const k = 'pendiente_' + pm.info.requestName;",
+                  "let v = pm.environment.get(k);",
+                  "if (!v) { v = pm.variables.replaceIn('{{$guid}}'); pm.environment.set(k, v); }",
+                  "pm.variables.set('clave_operacion', v);",
+                  "pm.environment.set('ultima_clave', v);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "const r = pm.response.json();",
+                  "pm.test(\"Respuesta JSON coherente\", function () { pm.expect(r.ok).to.eql(true); });",
+                  "if (pm.response.code < 400) {",
+                  "const d = r.datos;",
+                  "pm.environment.set(\"version\", d.version);",
+                  "}",
+                  "",
+                  "if (pm.response.code < 500) { pm.environment.unset(\"pendiente_\" + pm.info.requestName); }"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "07.5 Reporte de ventas entregadas",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/reportes/ventas?desde={{desde}}&hasta={{hasta}}",
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_admin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "const r = pm.response.json();",
+                  "pm.test(\"Respuesta JSON coherente\", function () { pm.expect(r.ok).to.eql(true); });",
+                  "if (pm.response.code < 400) {",
+                  "const d = r.datos;",
+                  "",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "07.6 Reporte de tiempos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/reportes/tiempos?desde={{desde}}&hasta={{hasta}}",
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_admin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "const r = pm.response.json();",
+                  "pm.test(\"Respuesta JSON coherente\", function () { pm.expect(r.ok).to.eql(true); });",
+                  "if (pm.response.code < 400) {",
+                  "const d = r.datos;",
+                  "",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "07.7 Auditoría",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/admin/auditoria?pagina=1",
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_admin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "const r = pm.response.json();",
+                  "pm.test(\"Respuesta JSON coherente\", function () { pm.expect(r.ok).to.eql(true); });",
+                  "if (pm.response.code < 400) {",
+                  "const d = r.datos;",
+                  "",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "07.8 Tabla real pedidos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/admin/tablas/pedido?pagina=1",
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_admin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "const r = pm.response.json();",
+                  "pm.test(\"Respuesta JSON coherente\", function () { pm.expect(r.ok).to.eql(true); });",
+                  "if (pm.response.code < 400) {",
+                  "const d = r.datos;",
+                  "",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "07.9 Tabla real detalles",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/admin/tablas/detalle?pagina=1",
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_admin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "const r = pm.response.json();",
+                  "pm.test(\"Respuesta JSON coherente\", function () { pm.expect(r.ok).to.eql(true); });",
+                  "if (pm.response.code < 400) {",
+                  "const d = r.datos;",
+                  "",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "07.10 Usuarios sin credenciales",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/admin/tablas/usuario?pagina=1",
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_admin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "const r = pm.response.json();",
+                  "pm.test(\"Respuesta JSON coherente\", function () { pm.expect(r.ok).to.eql(true); });",
+                  "if (pm.response.code < 400) {",
+                  "const d = r.datos;",
+                  "",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "07.11 Historial de estados",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/admin/tablas/historial?pagina=1",
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_admin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "const r = pm.response.json();",
+                  "pm.test(\"Respuesta JSON coherente\", function () { pm.expect(r.ok).to.eql(true); });",
+                  "if (pm.response.code < 400) {",
+                  "const d = r.datos;",
+                  "",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "07.12 Listar pedidos propios del mesero",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/pedidos?pagina=1",
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_mesero}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "const r = pm.response.json();",
+                  "pm.test(\"Respuesta JSON coherente\", function () { pm.expect(r.ok).to.eql(true); });",
+                  "if (pm.response.code < 400) {",
+                  "const d = r.datos;",
+                  "",
+                  "}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "08 · Cerrar sesiones",
+      "description": "Después de cerrar sesión debes volver a hacer login.",
+      "item": [
+        {
+          "name": "08 Logout mesero",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{base_url}}/auth/logout",
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_mesero}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "const r = pm.response.json();",
+                  "pm.test(\"Respuesta JSON coherente\", function () { pm.expect(r.ok).to.eql(true); });",
+                  "if (pm.response.code < 400) {",
+                  "const d = r.datos;",
+                  "",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "08 Logout cocina",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{base_url}}/auth/logout",
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_cocina}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "const r = pm.response.json();",
+                  "pm.test(\"Respuesta JSON coherente\", function () { pm.expect(r.ok).to.eql(true); });",
+                  "if (pm.response.code < 400) {",
+                  "const d = r.datos;",
+                  "",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "08 Logout admin",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{base_url}}/auth/logout",
+            "description": "",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token_admin}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"HTTP 200\", function () { pm.response.to.have.status(200); });",
+                  "const r = pm.response.json();",
+                  "pm.test(\"Respuesta JSON coherente\", function () { pm.expect(r.ok).to.eql(true); });",
+                  "if (pm.response.code < 400) {",
+                  "const d = r.datos;",
+                  "",
+                  "}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "if (!pm.environment.get('sufijo')) pm.environment.set('sufijo', Date.now().toString().slice(-9));",
+          "if (!pm.environment.get('desde')) pm.environment.set('desde', new Date().toISOString().slice(0,10));",
+          "if (!pm.environment.get('hasta')) pm.environment.set('hasta', new Date().toISOString().slice(0,10));"
+        ]
+      }
+    }
+  ]
+}

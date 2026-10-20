@@ -1,0 +1,31 @@
+POLIRESTAURANTE - API PARA POSTMAN / VS CODE
+
+Abre la carpeta backend_api en VS Code y sigue README.md.
+Esta entrega no contiene frontend ni requiere ejecutar el menú anterior.
+
+RÁPIDO CON SQLITE, desde backend_api:
+python -m venv .venv
+.venv\Scripts\python.exe -m pip install -r requirements.txt
+.venv\Scripts\python.exe iniciar_api.py --crear-admin
+.venv\Scripts\python.exe iniciar_api.py
+
+CON MYSQL YA CONFIGURADO EN LA ENTREGA DRIVER ANTERIOR:
+Copia tu config_mysql.json a backend_api, sin duplicar la extensión.
+Instala requirements-mysql.txt e inicia con --motor mysql.
+Conserva tu administrador existente. No importes esquemas de versiones ORM/Flask antiguas.
+Lee docs/MYSQL.md para una instalación nueva.
+
+POSTMAN:
+Importa colección y entorno de postman/.
+Selecciona el entorno local y escribe admin_login/admin_password.
+Envía las peticiones en orden desde 00; 01 y 02 solo para empleados nuevos.
+Cada petición guarda IDs/tokens/versiones para el paso siguiente.
+00.4 carga 4 categorías, 10 productos y 6 mesas, una sola vez.
+Los ejemplos de claves de empleados son para clase y se pueden editar antes de crearlos.
+
+EXPLICAR CÓDIGO: docs/EXPLICACION_CODIGO.md
+RUTAS Y JSON: docs/API.md
+SOLUCIONAR ERRORES: docs/POSTMAN_VSCODE.md
+
+El primer dueño no tiene contraseña predeterminada: la eliges al crearlo.
+No hay db upgrade ni frontend que arrancar.

@@ -1,0 +1,1031 @@
+{
+  "info": {
+    "name": "Nicolas | PoliRestaurante HU06-08 HU13-15",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Importar y ejecutar en orden lógico; primero POST pedido demo, luego cambios de estado. Los IDs se guardan automáticamente en variables de colección."
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://127.0.0.1:5001"
+    },
+    {
+      "key": "admin_id",
+      "value": "1"
+    },
+    {
+      "key": "cocina_id",
+      "value": "4"
+    },
+    {
+      "key": "pedido_id",
+      "value": "1"
+    },
+    {
+      "key": "historial_id",
+      "value": "1"
+    },
+    {
+      "key": "reporte_id",
+      "value": "1"
+    }
+  ],
+  "item": [
+    {
+      "name": "HU-06 Cola",
+      "item": [
+        {
+          "name": "GET cola",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Usuario-Id",
+                "value": "{{cocina_id}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/cola",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "cola"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP esperado\", function () { pm.expect(pm.response.code).to.be.oneOf([200,201]); });",
+                  "pm.test(\"Respuesta JSON\", function () { pm.expect(pm.response.json()).to.have.property(\"ok\", true); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST pedido demo (admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Usuario-Id",
+                "value": "{{admin_id}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/pedidos/demo",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "pedidos",
+                "demo"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id_mesa\": 1,\n  \"id_producto\": 1,\n  \"cantidad\": 2\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP esperado\", function () { pm.expect(pm.response.code).to.be.oneOf([200,201]); });",
+                  "pm.test(\"Respuesta JSON\", function () { pm.expect(pm.response.json()).to.have.property(\"ok\", true); });",
+                  "let datos=pm.response.json().datos; if(datos && datos.id_pedido) pm.collectionVariables.set(\"id_pedido\",datos.id_pedido);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET pedido por ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Usuario-Id",
+                "value": "{{cocina_id}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/pedidos/{{pedido_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "pedidos",
+                "{{pedido_id}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP esperado\", function () { pm.expect(pm.response.code).to.be.oneOf([200,201]); });",
+                  "pm.test(\"Respuesta JSON\", function () { pm.expect(pm.response.json()).to.have.property(\"ok\", true); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DELETE pedido demo (admin)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "X-Usuario-Id",
+                "value": "{{admin_id}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/pedidos/{{pedido_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "pedidos",
+                "{{pedido_id}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP esperado\", function () { pm.expect(pm.response.code).to.be.oneOf([200,201]); });",
+                  "pm.test(\"Respuesta JSON\", function () { pm.expect(pm.response.json()).to.have.property(\"ok\", true); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "HU-07 Preparación",
+      "item": [
+        {
+          "name": "GET en preparación",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Usuario-Id",
+                "value": "{{cocina_id}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/preparacion",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "preparacion"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP esperado\", function () { pm.expect(pm.response.code).to.be.oneOf([200,201]); });",
+                  "pm.test(\"Respuesta JSON\", function () { pm.expect(pm.response.json()).to.have.property(\"ok\", true); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PUT iniciar preparación",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "X-Usuario-Id",
+                "value": "{{cocina_id}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/pedidos/{{pedido_id}}/estado",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "pedidos",
+                "{{pedido_id}}",
+                "estado"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estado\": \"EN_PREPARACION\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP esperado\", function () { pm.expect(pm.response.code).to.be.oneOf([200,201]); });",
+                  "pm.test(\"Respuesta JSON\", function () { pm.expect(pm.response.json()).to.have.property(\"ok\", true); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PATCH corrección admin a PENDIENTE",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "X-Usuario-Id",
+                "value": "{{admin_id}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/pedidos/{{pedido_id}}/estado",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "pedidos",
+                "{{pedido_id}}",
+                "estado"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estado\": \"PENDIENTE\",\n  \"correccion\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP esperado\", function () { pm.expect(pm.response.code).to.be.oneOf([200,201]); });",
+                  "pm.test(\"Respuesta JSON\", function () { pm.expect(pm.response.json()).to.have.property(\"ok\", true); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "HU-08 Listos",
+      "item": [
+        {
+          "name": "GET listos",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Usuario-Id",
+                "value": "{{cocina_id}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/listos",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "listos"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP esperado\", function () { pm.expect(pm.response.code).to.be.oneOf([200,201]); });",
+                  "pm.test(\"Respuesta JSON\", function () { pm.expect(pm.response.json()).to.have.property(\"ok\", true); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PUT marcar LISTO",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "X-Usuario-Id",
+                "value": "{{cocina_id}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/pedidos/{{pedido_id}}/estado",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "pedidos",
+                "{{pedido_id}}",
+                "estado"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estado\": \"LISTO\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP esperado\", function () { pm.expect(pm.response.code).to.be.oneOf([200,201]); });",
+                  "pm.test(\"Respuesta JSON\", function () { pm.expect(pm.response.json()).to.have.property(\"ok\", true); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "HU-13 Ventas",
+      "item": [
+        {
+          "name": "POST guardar reporte ventas",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Usuario-Id",
+                "value": "{{admin_id}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/reportes",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "reportes"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipo\": \"VENTAS\",\n  \"nombre\": \"Ventas octubre\",\n  \"fecha_inicio\": \"2026-10-01\",\n  \"fecha_fin\": \"2026-10-31\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP esperado\", function () { pm.expect(pm.response.code).to.be.oneOf([200,201]); });",
+                  "pm.test(\"Respuesta JSON\", function () { pm.expect(pm.response.json()).to.have.property(\"ok\", true); });",
+                  "let datos=pm.response.json().datos; if(datos && datos.id_reporte) pm.collectionVariables.set(\"id_reporte\",datos.id_reporte);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET calcular ventas",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Usuario-Id",
+                "value": "{{admin_id}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/reportes/{{reporte_id}}/calcular",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "reportes",
+                "{{reporte_id}}",
+                "calcular"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP esperado\", function () { pm.expect(pm.response.code).to.be.oneOf([200,201]); });",
+                  "pm.test(\"Respuesta JSON\", function () { pm.expect(pm.response.json()).to.have.property(\"ok\", true); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "HU-14 Tiempos",
+      "item": [
+        {
+          "name": "POST guardar reporte tiempos",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Usuario-Id",
+                "value": "{{admin_id}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/reportes",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "reportes"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipo\": \"TIEMPOS\",\n  \"nombre\": \"Tiempos octubre\",\n  \"fecha_inicio\": \"2026-10-01\",\n  \"fecha_fin\": \"2026-10-31\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP esperado\", function () { pm.expect(pm.response.code).to.be.oneOf([200,201]); });",
+                  "pm.test(\"Respuesta JSON\", function () { pm.expect(pm.response.json()).to.have.property(\"ok\", true); });",
+                  "let datos=pm.response.json().datos; if(datos && datos.id_reporte) pm.collectionVariables.set(\"id_reporte\",datos.id_reporte);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET calcular tiempos",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Usuario-Id",
+                "value": "{{admin_id}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/reportes/{{reporte_id}}/calcular",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "reportes",
+                "{{reporte_id}}",
+                "calcular"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP esperado\", function () { pm.expect(pm.response.code).to.be.oneOf([200,201]); });",
+                  "pm.test(\"Respuesta JSON\", function () { pm.expect(pm.response.json()).to.have.property(\"ok\", true); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "HU-13 y HU-14 Reportes CRUD",
+      "item": [
+        {
+          "name": "GET todos",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Usuario-Id",
+                "value": "{{admin_id}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/reportes",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "reportes"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP esperado\", function () { pm.expect(pm.response.code).to.be.oneOf([200,201]); });",
+                  "pm.test(\"Respuesta JSON\", function () { pm.expect(pm.response.json()).to.have.property(\"ok\", true); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET uno",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Usuario-Id",
+                "value": "{{admin_id}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/reportes/{{reporte_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "reportes",
+                "{{reporte_id}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP esperado\", function () { pm.expect(pm.response.code).to.be.oneOf([200,201]); });",
+                  "pm.test(\"Respuesta JSON\", function () { pm.expect(pm.response.json()).to.have.property(\"ok\", true); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PUT editar",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "X-Usuario-Id",
+                "value": "{{admin_id}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/reportes/{{reporte_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "reportes",
+                "{{reporte_id}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Reporte actualizado\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP esperado\", function () { pm.expect(pm.response.code).to.be.oneOf([200,201]); });",
+                  "pm.test(\"Respuesta JSON\", function () { pm.expect(pm.response.json()).to.have.property(\"ok\", true); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DELETE eliminar",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "X-Usuario-Id",
+                "value": "{{admin_id}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/reportes/{{reporte_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "reportes",
+                "{{reporte_id}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP esperado\", function () { pm.expect(pm.response.code).to.be.oneOf([200,201]); });",
+                  "pm.test(\"Respuesta JSON\", function () { pm.expect(pm.response.json()).to.have.property(\"ok\", true); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "HU-15 Historial",
+      "item": [
+        {
+          "name": "POST crear entrada",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Usuario-Id",
+                "value": "{{admin_id}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/historial",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "historial"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id_pedido\": 1,\n  \"estado\": \"PENDIENTE\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP esperado\", function () { pm.expect(pm.response.code).to.be.oneOf([200,201]); });",
+                  "pm.test(\"Respuesta JSON\", function () { pm.expect(pm.response.json()).to.have.property(\"ok\", true); });",
+                  "let datos=pm.response.json().datos; if(datos && datos.id_historial) pm.collectionVariables.set(\"id_historial\",datos.id_historial);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET todos",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Usuario-Id",
+                "value": "{{admin_id}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/historial",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "historial"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP esperado\", function () { pm.expect(pm.response.code).to.be.oneOf([200,201]); });",
+                  "pm.test(\"Respuesta JSON\", function () { pm.expect(pm.response.json()).to.have.property(\"ok\", true); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET por ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Usuario-Id",
+                "value": "{{admin_id}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/historial/{{historial_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "historial",
+                "{{historial_id}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP esperado\", function () { pm.expect(pm.response.code).to.be.oneOf([200,201]); });",
+                  "pm.test(\"Respuesta JSON\", function () { pm.expect(pm.response.json()).to.have.property(\"ok\", true); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PATCH editar",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "X-Usuario-Id",
+                "value": "{{admin_id}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/historial/{{historial_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "historial",
+                "{{historial_id}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"estado\": \"EN_PREPARACION\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP esperado\", function () { pm.expect(pm.response.code).to.be.oneOf([200,201]); });",
+                  "pm.test(\"Respuesta JSON\", function () { pm.expect(pm.response.json()).to.have.property(\"ok\", true); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DELETE eliminar",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "X-Usuario-Id",
+                "value": "{{admin_id}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/historial/{{historial_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "historial",
+                "{{historial_id}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP esperado\", function () { pm.expect(pm.response.code).to.be.oneOf([200,201]); });",
+                  "pm.test(\"Respuesta JSON\", function () { pm.expect(pm.response.json()).to.have.property(\"ok\", true); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Utilidades",
+      "item": [
+        {
+          "name": "GET salud",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Usuario-Id",
+                "value": "{{admin_id}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/salud",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "salud"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP esperado\", function () { pm.expect(pm.response.code).to.be.oneOf([200,201]); });",
+                  "pm.test(\"Respuesta JSON\", function () { pm.expect(pm.response.json()).to.have.property(\"ok\", true); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET auditoría",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Usuario-Id",
+                "value": "{{admin_id}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auditoria",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auditoria"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Código HTTP esperado\", function () { pm.expect(pm.response.code).to.be.oneOf([200,201]); });",
+                  "pm.test(\"Respuesta JSON\", function () { pm.expect(pm.response.json()).to.have.property(\"ok\", true); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

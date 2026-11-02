@@ -1,0 +1,87 @@
+DOS DAO EN UNA FUNCIONALIDAD - JUAN PARRA
+=======================================
+
+1. ¿QUÉ SIGNIFICA DAO?
+
+DAO significa Data Access Object (objeto de acceso a datos).
+Es una clase del BACKEND que encapsula consultas SQL de un conjunto de datos.
+Por ejemplo, PedidoDAO obtiene un pedido y sus datos; ProductoDAO consulta
+el producto, su categoría y su precio. El servicio decide las reglas del restaurante.
+
+No significa crear dos bases, ni dos conexiones independientes, ni que
+un formulario tenga dos tablas HTML. Tampoco basta con crear dos archivos
+DAO y nunca llamarlos. La operación debe utilizarlos de verdad.
+
+2. FUNCIONALIDAD QUE CUMPLE EL REQUISITO
+
+HU02: AGREGAR UN PRODUCTO A UN PEDIDO.
+
+Interfaz: abrir pedido pendiente -> elegir producto/cantidad -> Agregar.
+Endpoint: POST /api/v1/pedidos/<pedido_id>/detalles.
+Servicio: Restaurante.agregar_producto, en backend_api/poli/servicio.py.
+
+Dentro de su función accion(c, u) están estas llamadas reales:
+
+pedido_dao = PedidoDAO(c)
+producto_dao = ProductoDAO(c)
+p = self._pedido(c, u, pid, version, dao=pedido_dao)
+producto = producto_dao.obtener(producto_id)
+pedido_dao.contar_detalles(pid)
+pedido_dao.insertar_detalle(pid, producto, cantidad, notas)
+
+La función _pedido delega en pedido_dao.obtener(pid) y verifica dueño del
+pedido y versión. Después el servicio verifica PENDIENTE y disponibilidad.
+
+PedidoDAO: backend_api/poli/dao/pedido_dao.py
+- obtener: SELECT de pedido.
+- contar_detalles: cuenta líneas para aplicar el límite.
+- insertar_detalle: INSERT con copia histórica de precio/nombres/categoría.
+- actualizar_version: UPDATE con control de versión.
+
+ProductoDAO: backend_api/poli/dao/producto_dao.py
+- obtener: SELECT de producto JOIN categoria, con parámetros separados.
+
+Ambos reciben EL MISMO cursor c que abrió Base.transaccion.
+No llaman commit ni abren una conexión propia. El servicio registra auditoría,
+versión y recibo. Base.transaccion confirma todo junto o hace rollback ante error.
+
+3. ¿POR QUÉ NECESITAMOS DOS?
+
+El pedido indica si existe, a quién pertenece y si aún se puede editar.
+El producto indica si existe, está disponible y cuánto vale en la base.
+Solo comprobar uno dejaría incompleta la operación. El precio no puede
+venir confiado del navegador: un usuario podría cambiarlo desde F12/Postman.
+
+Es una sola funcionalidad que coordina dos fuentes de datos de la misma base.
+No se llama desde JavaScript a los DAO directamente: el cliente llama a Flask.
+
+4. CÓMO MOSTRARLO AL PROFESOR
+
+- Busca REQUISITO DOCENTE en backend_api/poli/servicio.py.
+- Abre agregar_producto y las dos clases DAO.
+- Pon breakpoints en PedidoDAO.obtener y ProductoDAO.obtener.
+- Envía Agregar al pedido desde la interfaz o Postman.
+- Se ejecutan ambos breakpoints dentro de la misma operación.
+- Continúa F5 después de cada pausa para que el navegador reciba respuesta.
+- Consulta el detalle en Workbench para ver la inserción real.
+
+5. PRUEBA AUTOMÁTICA QUE LO DEMUESTRA
+
+Archivo: backend_api/tests/test_dao_cors.py
+Método: test_dos_dao_reales_comparten_cursor_en_peticion_hu02.
+
+Envía un POST a la API, observa llamadas a ambos métodos REALES (no sustituye
+la consulta por datos falsos), comprueba que usan el MISMO cursor y verifica
+el total persistido. Otra prueba fuerza fallo del segundo DAO y comprueba
+que no quedó un detalle parcial ni aumentó la versión del pedido.
+
+Ejecutar desde backend_api:
+.venv\Scripts\python.exe -m unittest discover -s tests -p test_dao_cors.py -v
+
+6. FRASE PARA EXPLICARLO
+
+"En mi HU02 el servicio coordina PedidoDAO y ProductoDAO. El primero obtiene
+el pedido y permite registrar su detalle; el segundo obtiene el producto
+con su precio real. El servicio valida permisos, estado y disponibilidad.
+Los dos comparten una transacción, de modo que el detalle, la versión y
+la auditoría se guardan juntos o se revierten juntos."

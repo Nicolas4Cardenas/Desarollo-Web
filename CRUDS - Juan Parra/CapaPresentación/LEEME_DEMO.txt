@@ -1,0 +1,94 @@
+POLIRESTAURANTE - DEMOSTRACIÓN LISTA PARA CLASE
+============================================
+
+BASE COMPATIBLE: polirestaurante_driver, la de tus mysql_01_esquema.sql y mysql_02_usuario.sql.
+Se conserva el cliente MVC de Juan, CORS y HU02 con dos DAO.
+
+QUÉ SE CARGA
+- 1 administrador NUEVO: admin.demo.
+- 3 meseros: juan.demo, mesero2.demo, mesero3.demo.
+- 3 cocineros: cocina1.demo, cocina2.demo, cocina3.demo.
+- Catálogo de 6 categorías, 20 productos y 12 mesas.
+
+Las credenciales están en CREDENCIALES_DEMO.txt (abrir con Bloc de notas).
+Estas cuentas pueden entrar directamente: no se pide cambio de clave temporal.
+Las cuentas normales creadas por la API siguen usando sus reglas anteriores.
+
+PASOS CON TU MYSQL EXISTENTE
+
+1) Descomprime el paquete completo y abre su carpeta en VS Code.
+2) Copia tu config_mysql.json actual dentro de backend_api.
+   El nombre es exactamente config_mysql.json, no config_mysql.json.json.
+   No necesitas volver a importar mysql_01 ni mysql_02 si tu base ya funciona.
+3) En terminal, desde la carpeta completa del paquete:
+
+cd backend_api
+python -m venv .venv
+.venv\Scripts\python.exe -m pip install -r requirements-mysql.txt
+.venv\Scripts\python.exe cargar_demo.py --motor mysql
+.venv\Scripts\python.exe iniciar_api.py --motor mysql
+
+Si ya tienes .venv, puedes conservarla e instalar requisitos de nuevo.
+La carga usa la cuenta de conexión MySQL de tu config; no pide la contraseña
+olvidada del administrador antiguo. No cambia ese administrador ni sus empleados.
+La carga no ocurre sola al arrancar: hay que ejecutar cargar_demo.py una vez.
+
+4) Abre http://127.0.0.1:5000/ en tu navegador.
+   También sirve cliente_juan/cliente.html -> Open with Live Server (puerto 5500).
+5) Entra como juan.demo usando la contraseña del bloc de notas.
+6) Crea un pedido, agrega productos, edita o quita líneas.
+7) Cierra sesión, entra como cocina1.demo, inicia preparación y marca listo.
+8) Vuelve a juan.demo, actualiza el listado y entrega la orden.
+   Puedes entrar como admin.demo para probar las acciones de administración del backend.
+
+CONSERVACIÓN DE DATOS
+
+La carga se confirma en una sola transacción. No borra tablas, usuarios ni pedidos.
+Si ya existe una categoría/producto/mesa con el mismo nombre/número, lo conserva,
+incluso si tiene otro precio o está archivado. Por ello en una base antigua los
+nuevos registros insertados pueden ser menos que los del catálogo de referencia.
+No libera mesas que estuvieran ocupadas ni altera sus pedidos.
+No añade pedidos ficticios: tú los creas para la práctica.
+
+La carga deja una marca con los ID de sus cuentas. Si la ejecutas otra vez,
+no duplica los datos ni cambia tus contraseñas. Si un login reservado, por ejemplo
+admin.demo, ya existía ANTES de esta carga, se detiene sin cambiar nada para no
+sobrescribir esa cuenta. Los usuarios con nombres distintos se conservan.
+
+SI UNA CUENTA DEMO SE BLOQUEÓ O CAMBIASTE SU CONTRASEÑA
+
+Desde backend_api:
+.venv\Scripts\python.exe cargar_demo.py --motor mysql --restablecer-claves-demo
+
+Solo recupera las siete cuentas creadas y marcadas por esta carga. Restablece sus
+claves a las del TXT, quita el bloqueo y revoca sus sesiones. Después inicia sesión
+de nuevo. No modifica cuentas antiguas. Si cambiaste login/rol o desactivaste una
+cuenta demo, la utilidad pide revisarla con administrador en lugar de sobrescribirla.
+
+MYSQL NUEVO
+
+Solo si la base no está creada todavía, sigue backend_api/docs/MYSQL.md:
+ejecuta primero mysql_01_esquema.sql y luego mysql_02_usuario.sql con tu contraseña
+de conexión. Usa las plantillas de backend_api/sql, no copies una contraseña de otra persona.
+Después usa cargar_demo.py; no hace falta --crear-admin para el demo, porque crea su dueño.
+
+SQLITE SIN MYSQL (OPCIONAL)
+
+Desde backend_api:
+python -m venv .venv
+.venv\Scripts\python.exe -m pip install -r requirements.txt
+.venv\Scripts\python.exe cargar_demo.py
+.venv\Scripts\python.exe iniciar_api.py
+
+Sin --motor mysql usas SQLite y los datos no aparecen en Workbench.
+No necesitas Postman para la carga ni para usar esta interfaz.
+
+ARCHIVOS DE APOYO
+
+CREDENCIALES_DEMO.txt: usuarios, claves, roles y recuperación del demo.
+README_JUAN_MVC.md: interfaz, conexión y reglas de pedidos.
+docs_juan/DOS_DAOS_JUAN.txt: dónde se cumple el requisito de los dos DAO.
+docs_juan/EXPLICACION_MVC_Y_DAO.md: explicación del código y sustentación.
+
+Las claves del demo son conocidas y sirven para clase; conserva contraseñas propias
+si posteriormente conviertes el proyecto en una instalación de uso real.

@@ -1,0 +1,74 @@
+POLIRESTAURANTE - GUIA PARA MOSTRAR AL PROFESOR
+VERSION PARA LA PROXIMA CLASE: SOLO INSERT Y LISTAR
+
+1) QUE ES CADA CAPA
+- frontend/js/view.js: botones y tablas de la pagina (Vista).
+- frontend/js/controller.js: recoge el clic y llama al modelo.
+- frontend/js/model.js: usa fetch para hablar con Flask.
+- backend/app.py: recibe GET y POST; es el controlador web.
+- backend/manager.py: coordina la funcionalidad HU-06.
+- backend/dao.py: tiene DOS DAO con consultas distintas.
+- backend/db.py: AQUI ESTA LA CONEXION A MYSQL (mysql.connector).
+
+2) DONDE MOSTRAR LOS DOS DAO
+Abrir backend/dao.py y señalar:
+  class PedidoDAO:           (DAO 1) lee tabla pedido
+  class DetallePedidoDAO:    (DAO 2) lee detalle_pedido + producto
+Ambos tienen un comentario que empieza por 'AQUI ESTA'.
+
+3) DONDE MOSTRAR EL MANAGER
+Abrir backend/manager.py y señalar:
+  class PedidoManager
+  def consultar_cola(self, db):
+  self.pedido_dao.listar_pendientes(db)   <-- primer DAO
+  self.detalle_dao.listar_de_pedidos(...) <-- segundo DAO
+  return [...]                             <-- combina datos
+
+4) COMO LLEGA LA PETICION
+En la pagina Cocina, consultar la cola (LISTAR).
+Navegador -> frontend/js/model.js -> GET /api/cola -> backend/app.py
+-> PedidoManager.consultar_cola() -> PedidoDAO + DetallePedidoDAO
+-> MySQL -> JSON -> navegador.
+
+5) FRASE PARA EXPLICAR
+'En la HU-06 muestro el requisito de minimo dos DAO en una
+funcionalidad. La solicitud GET /api/cola llega al controlador Flask;
+el PedidoManager consulta PedidoDAO para obtener pedidos pendientes
+y DetallePedidoDAO para obtener sus productos. Los datos se combinan
+y se muestran en el listado. Cada DAO separa el acceso a datos de
+la logica de negocio. La conexion a MySQL esta en db.py.'
+
+6) QUÉ INSERTAR Y LISTAR EN ESTA ENTREGA
+INSERT PEDIDO: panel Pedidos -> Insertar pedido (admin #1).
+LISTAR PEDIDOS: panel Pedidos o Cocina.
+LISTAR HU-06: GET /api/cola (usa DOS DAO).
+LISTAR HU-07: GET /api/preparacion.
+LISTAR HU-08: GET /api/listos.
+INSERT REPORTE: panel Reportes -> Insertar reporte (VENTAS o TIEMPOS).
+LISTAR REPORTE: panel Reportes.
+INSERT HISTORIAL: panel Historial -> Insertar registro (admin #1).
+LISTAR HISTORIAL: panel Historial.
+
+IMPORTANTE: HU-07 y HU-08 son cambios de estado (UPDATE), no INSERT.
+Por eso, para la clase actual solo se listan sus pedidos. Sus cambios
+de estado se retomaran en la siguiente etapa. No se muestran botones
+para editar ni eliminar y la API solo expone GET y POST.
+
+NOTA HISTORIAL: insertar manualmente un registro no cambia el estado
+actual de pedido. Utilizar solo registros de demostracion y no
+confundirlo con la transicion oficial de estados.
+
+7) PRUEBA RAPIDA EN POSTMAN
+GET  http://127.0.0.1:5001/api/cola   Header X-Usuario-Id: 4
+POST http://127.0.0.1:5001/api/pedidos/demo
+     Header X-Usuario-Id: 1; Content-Type: application/json
+     JSON {"id_mesa":2,"id_producto":2,"cantidad":1}
+GET http://127.0.0.1:5001/api/reportes Header X-Usuario-Id: 1
+POST http://127.0.0.1:5001/api/reportes Header X-Usuario-Id: 1
+     JSON {"tipo":"VENTAS","nombre":"Prueba","fecha_inicio":"2026-10-01","fecha_fin":"2026-10-31"}
+
+8) LIMITACIONES
+Las credenciales admin #1 / cocina #4 son IDs de demostracion, no login.
+La base de datos debe existir antes; no volver a ejecutar backend_original.sql.
+Se conserva el archivo nucleo.py por reutilizacion del proyecto anterior,
+aunque esta version de API no expone UPDATE ni DELETE.

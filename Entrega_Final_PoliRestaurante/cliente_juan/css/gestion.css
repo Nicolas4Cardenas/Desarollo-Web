@@ -1,0 +1,49 @@
+/* Extensión del cliente de Juan: conserva la paleta, tipografía y tarjetas. */
+.menu-gestion {
+  display: flex; gap: .32rem; flex-wrap: wrap; align-items: center;
+  background: var(--white); padding: .44rem; border: 1px solid var(--line);
+  border-radius: 12px; margin-bottom: 1.15rem;
+}
+.menu-gestion button {
+  border: 0; background: transparent; color: var(--navy);
+  border-radius: 8px; padding: .55rem .68rem; white-space: nowrap;
+  font-size: .82rem; font-weight: 620;
+}
+.menu-gestion button:hover { background: var(--paper); }
+.menu-gestion button[aria-current="page"] { background: var(--navy); color: white; }
+.menu-gestion button:last-child { margin-left: auto; }
+.gestion-toolbar { display: flex; flex-wrap: wrap; align-items: end; gap: .7rem; padding: 1rem; }
+.gestion-toolbar > label { min-width: 9rem; }
+.gestion-toolbar > .crece { flex: 1 1 15rem; }
+.gestion-toolbar .form-label, .gestion-form .form-label { display: block; margin-bottom: .28rem; }
+.gestion-table { margin-bottom: 0; font-size: .86rem; }
+.gestion-table th { white-space: nowrap; background: #f6f8f9; color: var(--navy); }
+.gestion-table th, .gestion-table td { padding: .76rem 1rem; vertical-align: middle; }
+.gestion-table td { overflow-wrap: anywhere; }
+.gestion-table .acciones-registro { white-space: nowrap; }
+.gestion-table .acciones-registro button { margin: .12rem .18rem .12rem 0; }
+.gestion-pagina { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .5rem; padding: .85rem 1rem; }
+.gestion-contenido { padding: 1rem 1.2rem; }
+.gestion-tarjetas { display: grid; grid-template-columns: repeat(auto-fit,minmax(9rem,1fr)); gap: .7rem; margin: 1rem 0; }
+.gestion-cifra { padding: .85rem 1rem; border: 1px solid var(--line); border-radius: 10px; background: var(--paper); }
+.gestion-cifra strong { font-size: 1.26rem; color: var(--navy); display: block; }
+.gestion-form { display: grid; gap: .85rem; }
+.gestion-form label { min-width: 0; }
+.gestion-form .form-check { margin: 0; }
+.gestion-nota { color: var(--muted); font-size: .82rem; }
+.gestion-estado { display: inline-block; border-radius: 20px; padding: .2rem .55rem; background: #e8f3ef; color: #145643; font-weight: 650; white-space: nowrap; }
+.gestion-estado.inactivo { background: #f2e9e6; color: #7c392c; }
+.gestion-detalle { display: grid; grid-template-columns: minmax(6rem, auto) minmax(0, 1fr); gap: .5rem 1rem; margin: .5rem 0; }
+.gestion-detalle dd { margin: 0; overflow-wrap: anywhere; }
+.gestion-recibo { max-height: 19rem; overflow: auto; background: var(--paper); border-radius: 8px; padding: 1rem; white-space: pre-wrap; }
+#gestion-dialog { max-width: min(38rem, calc(100% - 2rem)); max-height: calc(100dvh - 2rem); overflow: auto; }
+#gestion-dialog .dialog-error { margin-bottom: 0; }
+#filtros-form { flex-wrap: wrap; }
+#filtros-form .form-check { flex: 0 0 auto; }
+@media (max-width: 650px) {
+  .menu-gestion button { padding: .5rem .56rem; }
+  .menu-gestion button:last-child { margin-left: 0; }
+  .gestion-toolbar > label { flex: 1 1 9rem; }
+  .gestion-table th, .gestion-table td { padding: .56rem .72rem; }
+  .gestion-pagina { justify-content: center; }
+}

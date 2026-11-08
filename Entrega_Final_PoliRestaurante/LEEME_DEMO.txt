@@ -1,0 +1,12 @@
+POLIRESTAURANTE - PRESENTACIÓN COMPLETA
+======================================
+
+1. Descomprime toda la carpeta y ábrela en VS Code.
+2. Lee GUIA_PRESENTACION_COMPLETA.md. Tiene pasos para tu MySQL existente,
+   una alternativa con SQLite y las funciones de cada rol.
+3. Abre CREDENCIALES_DEMO.txt con Bloc de notas para consultar los accesos.
+4. Una vez iniciada la API, abre http://127.0.0.1:5000/ en el navegador.
+
+Como admin.demo, abre Usuarios para crear meseros, cocina u otro
+administrador, editar sus datos, restablecer claves o desactivar cuentas.
+Las credenciales del restaurante son distintas de las de config_mysql.json.

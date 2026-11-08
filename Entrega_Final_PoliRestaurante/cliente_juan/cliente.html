@@ -1,0 +1,579 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light" />
+    <title>PoliRestaurante · Gestión del restaurante</title>
+    <link rel="stylesheet" href="vendor/bootstrap/bootstrap.min.css" />
+    <link rel="stylesheet" href="css/styles.css" />
+    <link rel="stylesheet" href="css/gestion.css" />
+    <script type="module" src="js/app.js"></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#contenido">Ir al contenido</a>
+    <header class="app-header">
+      <div class="container-xl header-inner">
+        <a class="brand" href="cliente.html"
+          ><span class="brand-mark" aria-hidden="true">PR</span
+          ><span
+            >Poli<span class="brand-light">Restaurante</span
+            ><small>Gestión de pedidos</small></span
+          ></a
+        >
+        <div id="sesion-activa" class="session-info" hidden>
+          <span
+            ><strong id="usuario-nombre"></strong
+            ><small id="usuario-rol"></small
+          ></span>
+          <button
+            type="button"
+            class="btn btn-outline-light btn-sm"
+            data-accion="salir"
+          >
+            Cerrar sesión
+          </button>
+        </div>
+      </div>
+    </header>
+    <main id="contenido" class="container-xl py-4">
+      <div
+        id="mensaje"
+        class="alert"
+        role="status"
+        aria-live="polite"
+        hidden
+      ></div>
+      <section
+        id="pendiente-banner"
+        class="alert alert-warning"
+        aria-labelledby="pendiente-titulo"
+        hidden
+      >
+        <strong id="pendiente-titulo">Hay una operación por confirmar</strong>
+        <p id="pendiente-texto" class="mb-2"></p>
+        <div class="d-flex gap-2 flex-wrap">
+          <button
+            type="button"
+            class="btn btn-sm btn-dark"
+            data-accion="consultar-operacion"
+          >
+            Consultar resultado</button
+          ><button
+            type="button"
+            class="btn btn-sm btn-outline-dark"
+            data-accion="reintentar-operacion"
+          >
+            Reintentar la misma operación
+          </button>
+        </div>
+      </section>
+      <section id="login-panel" class="login-wrap">
+        <div class="login-intro">
+          <span class="eyebrow">POLIRESTAURANTE</span>
+          <h1>Todo pedido,<br />en su punto.</h1>
+          <p>
+            Registra una orden, ajusta sus productos y acompáñala hasta la
+            entrega.
+          </p>
+          <div class="intro-rule"></div>
+          <p class="small">
+            Pedidos de salón y para llevar.<br />Un espacio sencillo para tu
+            turno.
+          </p>
+        </div>
+        <div class="panel login-card">
+          <h2>Iniciar sesión</h2>
+          <p class="text-secondary mb-4">Usa tu cuenta del restaurante.</p>
+          <form id="login-form">
+            <label for="login" class="form-label">Usuario</label
+            ><input
+              id="login"
+              name="login"
+              class="form-control mb-3"
+              autocomplete="username"
+              required
+              minlength="3"
+              maxlength="40"
+              placeholder="Tu usuario"
+            />
+            <label for="password" class="form-label">Contraseña</label
+            ><input
+              id="password"
+              name="password"
+              type="password"
+              class="form-control mb-4"
+              autocomplete="current-password"
+              required
+              maxlength="128"
+            />
+            <button class="btn btn-primary w-100" type="submit">Entrar</button>
+            <details class="mt-4">
+              <summary class="small text-secondary">
+                Configuración de conexión
+              </summary>
+              <label for="api-url" class="form-label mt-3 small"
+                >Dirección de la API</label
+              ><input
+                id="api-url"
+                name="api_url"
+                type="url"
+                class="form-control form-control-sm"
+                required
+              />
+              <p class="small text-secondary mt-2 mb-0">
+                Normalmente no necesitas cambiar esta dirección.
+              </p>
+            </details>
+          </form>
+        </div>
+      </section>
+      <section id="password-panel" class="panel password-card" hidden>
+        <span class="eyebrow">PRIMER INGRESO</span>
+        <h1>Cambia tu contraseña temporal</h1>
+        <p class="text-secondary">
+          Elige una contraseña propia de entre 10 y 128 caracteres. Después
+          volverás a iniciar sesión.
+        </p>
+        <form id="password-form">
+          <label for="clave-actual" class="form-label">Contraseña actual</label
+          ><input
+            id="clave-actual"
+            name="actual"
+            type="password"
+            class="form-control mb-3"
+            autocomplete="current-password"
+            required
+          /><label for="clave-nueva" class="form-label">Nueva contraseña</label
+          ><input
+            id="clave-nueva"
+            name="nueva"
+            type="password"
+            class="form-control mb-3"
+            autocomplete="new-password"
+            minlength="10"
+            maxlength="128"
+            required
+          /><label for="clave-repite" class="form-label"
+            >Repite la nueva contraseña</label
+          ><input
+            id="clave-repite"
+            name="repite"
+            type="password"
+            class="form-control mb-4"
+            autocomplete="new-password"
+            minlength="10"
+            maxlength="128"
+            required
+          /><button class="btn btn-primary" type="submit">
+            Guardar contraseña
+          </button>
+        </form>
+      </section>
+      <nav id="menu-gestion" class="menu-gestion" aria-label="Módulos del restaurante" hidden></nav>
+      <section id="gestion-panel" aria-labelledby="gestion-titulo" hidden></section>
+      <section id="pedidos-panel" hidden>
+        <div class="page-heading">
+          <div>
+            <span class="eyebrow">OPERACIÓN DIARIA</span>
+            <h1 id="titulo-pedidos">Mis pedidos</h1>
+            <p id="subtitulo-pedidos" class="text-secondary mb-0">
+              Gestiona las órdenes de tu turno.
+            </p>
+          </div>
+          <div class="d-flex gap-2 flex-wrap">
+            <button
+              type="button"
+              id="cargar-catalogo"
+              class="btn btn-outline-secondary"
+              data-accion="catalogo"
+              hidden
+            >
+              Cargar menú inicial</button
+            ><button
+              type="button"
+              id="nuevo-pedido"
+              class="btn btn-primary"
+              data-accion="nuevo"
+            >
+              ＋ Nuevo pedido
+            </button>
+          </div>
+        </div>
+        <div class="row g-4 align-items-start">
+          <div class="col-12 col-xl-7">
+            <section
+              class="panel listado-panel"
+              aria-labelledby="listado-titulo"
+            >
+              <div class="panel-heading">
+                <div>
+                  <h2 id="listado-titulo">
+                    Listado de pedidos
+                    <span id="contador" class="counter">0</span>
+                  </h2>
+                  <p class="small text-secondary mb-0">
+                    Selecciona una orden para ver sus productos.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  class="btn btn-outline-secondary btn-sm"
+                  data-accion="recargar"
+                >
+                  Actualizar
+                </button>
+              </div>
+              <form id="filtros-form" class="filters">
+                <div>
+                  <label class="form-label small" for="buscar"
+                    >Buscar en esta página</label
+                  ><input
+                    id="buscar"
+                    type="search"
+                    class="form-control form-control-sm"
+                    placeholder="Número, mesa o responsable"
+                  />
+                </div>
+                <div>
+                  <label class="form-label small" for="filtro-estado"
+                    >Estado</label
+                  ><select
+                    id="filtro-estado"
+                    name="estado"
+                    class="form-select form-select-sm"
+                  >
+                    <option value="">Todos los estados</option>
+                    <option value="PENDIENTE">Pendiente</option>
+                    <option value="EN_PREPARACION">En preparación</option>
+                    <option value="LISTO">Listo</option>
+                    <option value="ENTREGADO">Entregado</option>
+                    <option value="CANCELADO">Cancelado</option>
+                  </select>
+                </div>
+                <label class="form-check small align-self-end mb-1" id="abiertos-campo">
+                  <input class="form-check-input" type="checkbox" name="abiertos" id="filtro-abiertos" /> Solo abiertos
+                </label>
+                <button
+                  type="submit"
+                  class="btn btn-sm btn-outline-primary align-self-end"
+                >
+                  Filtrar
+                </button>
+              </form>
+              <div class="table-responsive">
+                <table class="table orders-table align-middle mb-0">
+                  <caption class="visually-hidden">
+                    Pedidos disponibles según tu rol
+                  </caption>
+                  <thead>
+                    <tr>
+                      <th scope="col">Pedido</th>
+                      <th scope="col">Servicio</th>
+                      <th scope="col">Estado</th>
+                      <th scope="col" class="text-end">Total</th>
+                      <th scope="col">
+                        <span class="visually-hidden">Acción</span>
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody id="tabla-pedidos"></tbody>
+                </table>
+              </div>
+              <div class="pagination-bar">
+                <span id="pagina-info" class="small text-secondary"
+                  >Página 1</span
+                >
+                <div class="d-flex gap-2">
+                  <button
+                    type="button"
+                    id="pagina-anterior"
+                    class="btn btn-outline-secondary btn-sm"
+                    data-accion="anterior"
+                  >
+                    Anterior</button
+                  ><button
+                    type="button"
+                    id="pagina-siguiente"
+                    class="btn btn-outline-secondary btn-sm"
+                    data-accion="siguiente"
+                  >
+                    Siguiente
+                  </button>
+                </div>
+              </div>
+            </section>
+            <p id="nota-pedidos" class="scope-note">
+              Puedes modificar productos mientras el pedido esté pendiente. La
+              cocina actualiza su preparación.
+            </p>
+          </div>
+          <div class="col-12 col-xl-5">
+            <section id="detalle-vacio" class="panel empty-detail">
+              <div class="empty-mark" aria-hidden="true">↗</div>
+              <h2>Un pedido a la vista</h2>
+              <p class="text-secondary mb-0">
+                Abre una orden del listado o crea una nueva para empezar.
+              </p>
+            </section>
+            <section
+              id="detalle-panel"
+              class="panel detail-panel"
+              aria-labelledby="detalle-titulo"
+              hidden
+            >
+              <div class="panel-heading">
+                <div>
+                  <span class="eyebrow">DETALLE DE LA ORDEN</span>
+                  <h2 id="detalle-titulo" tabindex="-1"></h2>
+                  <p
+                    id="detalle-servicio"
+                    class="small text-secondary mb-0"
+                  ></p>
+                </div>
+                <span id="detalle-estado" class="state-badge"></span>
+              </div>
+              <div id="detalle-regla" class="detail-note"></div>
+              <div class="table-responsive">
+                <table class="table lines-table align-middle">
+                  <caption class="visually-hidden">
+                    Productos del pedido seleccionado
+                  </caption>
+                  <thead>
+                    <tr>
+                      <th scope="col">Producto</th>
+                      <th scope="col" class="text-center">Cant.</th>
+                      <th scope="col" class="text-end">Subtotal</th>
+                      <th scope="col">
+                        <span class="visually-hidden">Acciones</span>
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody id="tabla-detalles"></tbody>
+                </table>
+              </div>
+              <div class="order-total">
+                <span>Total del pedido</span
+                ><strong id="detalle-total"></strong>
+              </div>
+              <form id="agregar-form" class="add-form">
+                <h3>Agregar producto</h3>
+                <label for="categoria" class="form-label small">Categoría</label
+                ><select id="categoria" class="form-select form-select-sm mb-3">
+                  <option value="">Todas las categorías</option></select
+                ><label for="producto" class="form-label small"
+                  >Producto disponible</label
+                ><select
+                  id="producto"
+                  name="producto_id"
+                  class="form-select mb-3"
+                  required
+                ></select>
+                <div class="row g-2">
+                  <div class="col-4">
+                    <label for="cantidad" class="form-label small"
+                      >Cantidad</label
+                    ><input
+                      id="cantidad"
+                      name="cantidad"
+                      type="number"
+                      class="form-control"
+                      min="1"
+                      max="99"
+                      step="1"
+                      value="1"
+                      required
+                    />
+                  </div>
+                  <div class="col-8">
+                    <label for="notas" class="form-label small"
+                      >Observaciones</label
+                    ><input
+                      id="notas"
+                      name="notas"
+                      type="text"
+                      class="form-control"
+                      maxlength="255"
+                      placeholder="Ej. sin cebolla"
+                    />
+                  </div>
+                </div>
+                <button type="submit" class="btn btn-primary w-100 mt-3">
+                  Agregar al pedido
+                </button>
+              </form>
+              <div id="pedido-acciones" class="order-actions">
+                <button type="button" id="reasignar-pedido" class="btn btn-outline-primary" data-accion="reasignar" hidden>Reasignar</button>
+                <button
+                  type="button"
+                  id="preparar"
+                  class="btn btn-outline-primary"
+                  data-accion="preparar"
+                >
+                  Iniciar preparación</button
+                ><button
+                  type="button"
+                  id="listo"
+                  class="btn btn-primary"
+                  data-accion="listo"
+                >
+                  Marcar listo</button
+                ><button
+                  type="button"
+                  id="entregar"
+                  class="btn btn-primary"
+                  data-accion="entregar"
+                >
+                  Marcar entregado</button
+                ><button
+                  type="button"
+                  id="cancelar-pedido"
+                  class="btn btn-outline-danger"
+                  data-accion="cancelar"
+                >
+                  Cancelar pedido
+                </button>
+              </div>
+              <details class="history">
+                <summary>Historial del pedido</summary>
+                <ol id="historial"></ol>
+              </details>
+            </section>
+          </div>
+        </div>
+      </section>
+    </main>
+    <dialog id="gestion-dialog" class="app-dialog" aria-labelledby="gestion-dialog-titulo"></dialog>
+    <footer class="app-footer container-xl">
+      <span>PoliRestaurante</span><span>Presentación integral · PoliRestaurante</span>
+    </footer>
+    <div
+      id="actividad"
+      class="activity"
+      role="status"
+      aria-live="polite"
+      hidden
+    >
+      Procesando…
+    </div>
+    <dialog id="nuevo-dialog" class="app-dialog">
+      <form id="nuevo-form">
+        <div class="dialog-heading">
+          <h2>Nuevo pedido</h2>
+          <button
+            type="button"
+            class="close-dialog"
+            data-cerrar
+            aria-label="Cerrar"
+          >
+            ×
+          </button>
+        </div>
+        <p class="text-secondary">
+          Selecciona el tipo de servicio para abrir una orden.
+        </p>
+        <label for="tipo" class="form-label">Tipo de servicio</label
+        ><select id="tipo" name="tipo" class="form-select mb-3">
+          <option value="SALON">En el salón</option>
+          <option value="LLEVAR">Para llevar</option>
+        </select>
+        <div id="mesa-campo">
+          <label for="mesa" class="form-label">Mesa disponible</label
+          ><select
+            id="mesa"
+            name="mesa_id"
+            class="form-select"
+            required
+          ></select>
+        </div>
+        <div id="responsable-campo" class="mt-3" hidden>
+          <label for="nuevo-responsable" class="form-label">Responsable del pedido</label>
+          <select id="nuevo-responsable" name="responsable_id" class="form-select"></select>
+        </div>
+        <p id="sin-mesas" class="small text-danger mt-2" hidden>
+          No hay mesas libres. Puedes crear un pedido para llevar.
+        </p>
+        <div class="dialog-actions">
+          <button type="button" class="btn btn-outline-secondary" data-cerrar>
+            Volver</button
+          ><button type="submit" class="btn btn-primary">Crear pedido</button>
+        </div>
+      </form>
+    </dialog>
+    <dialog id="editar-dialog" class="app-dialog">
+      <form id="editar-form">
+        <div class="dialog-heading">
+          <h2>Editar producto del pedido</h2>
+          <button
+            type="button"
+            class="close-dialog"
+            data-cerrar
+            aria-label="Cerrar"
+          >
+            ×
+          </button>
+        </div>
+        <p id="editar-nombre" class="text-secondary"></p>
+        <input name="detalle_id" type="hidden" /><label
+          for="editar-cantidad"
+          class="form-label"
+          >Cantidad</label
+        ><input
+          id="editar-cantidad"
+          name="cantidad"
+          type="number"
+          class="form-control mb-3"
+          min="1"
+          max="99"
+          step="1"
+          required
+        /><label for="editar-notas" class="form-label">Observaciones</label
+        ><input
+          id="editar-notas"
+          name="notas"
+          class="form-control"
+          maxlength="255"
+        />
+        <div class="dialog-actions">
+          <button type="button" class="btn btn-outline-secondary" data-cerrar>
+            Volver</button
+          ><button type="submit" class="btn btn-primary">
+            Guardar cambios
+          </button>
+        </div>
+      </form>
+    </dialog>
+    <dialog id="confirmar-dialog" class="app-dialog">
+      <form id="confirmar-form">
+        <div class="dialog-heading">
+          <h2 id="confirmar-titulo"></h2>
+          <button
+            type="button"
+            class="close-dialog"
+            data-cerrar
+            aria-label="Cerrar"
+          >
+            ×
+          </button>
+        </div>
+        <p id="confirmar-texto" class="text-secondary"></p>
+        <div id="motivo-campo">
+          <label for="motivo" class="form-label">Motivo de cancelación</label
+          ><input
+            id="motivo"
+            name="motivo"
+            class="form-control"
+            maxlength="255"
+          />
+        </div>
+        <div class="dialog-actions">
+          <button type="button" class="btn btn-outline-secondary" data-cerrar>
+            Volver</button
+          ><button type="submit" id="confirmar-boton" class="btn btn-danger">
+            Confirmar
+          </button>
+        </div>
+      </form>
+    </dialog>
+  </body>
+</html>

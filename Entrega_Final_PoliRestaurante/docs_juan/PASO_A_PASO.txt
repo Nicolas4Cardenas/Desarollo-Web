@@ -1,0 +1,159 @@
+POLIRESTAURANTE - JUAN PARRA - EJECUCIÓN DE CLIENTE MVC
+===================================================
+
+A. PREPARAR LA CARPETA
+
+1) Descomprime TODO el ZIP. No ejecutes dentro del archivo comprimido.
+2) Abre en VS Code la carpeta que contiene backend_api y cliente_juan.
+3) Necesitas Python 3.10+ y Live Server (Ritwick Dey).
+   Prettier y HTML CSS Support son ayudas opcionales.
+4) La interfaz incluye Bootstrap local; no usa CDN ni npm para arrancar.
+
+B. SI YA TIENES MYSQL DEL PROYECTO ANTERIOR
+
+En la terminal de VS Code, desde la carpeta completa:
+
+cd backend_api
+python -m venv .venv
+.venv\Scripts\python.exe -m pip install -r requirements-mysql.txt
+
+Si la .venv ya existe, puedes conservarla e instalar requirements nuevamente.
+Copia TU config_mysql.json a backend_api. El nombre lleva solo UN .json.
+El archivo de ejemplo no tiene tu contraseña real.
+
+.venv\Scripts\python.exe iniciar_api.py --motor mysql --verificar
+
+Si sale correcto y YA TIENES dueño creado:
+
+.venv\Scripts\python.exe iniciar_api.py --motor mysql
+
+Si la base nunca tuvo usuarios, ANTES del arranque crea al dueño una sola vez:
+
+.venv\Scripts\python.exe iniciar_api.py --motor mysql --crear-admin
+
+Escribe nombre, login y tu contraseña dos veces. Las claves no se ven al teclear.
+Luego inicia con --motor mysql. Mantén la terminal abierta.
+
+NO vuelvas a importar SQL si polirestaurante_driver ya funciona.
+NO ejecutes db upgrade ni importes esquemas de la versión ORM antigua.
+Para MySQL nuevo sigue backend_api/docs/MYSQL.md (esquema y cuenta de conexión).
+
+C. SI EL PC NO TIENE MYSQL: SQLITE
+
+Desde backend_api:
+
+python -m venv .venv
+.venv\Scripts\python.exe -m pip install -r requirements.txt
+.venv\Scripts\python.exe iniciar_api.py --crear-admin
+.venv\Scripts\python.exe iniciar_api.py
+
+Crea al dueño solo una vez. SQLite persiste en datos/polirestaurante.db.
+No aparecerá en Workbench: es un motor diferente. Para MySQL usa siempre
+--motor mysql en TODOS los comandos. En macOS/Linux usa .venv/bin/python.
+Si Windows no reconoce python, prueba py -3 al crear el entorno.
+
+D. CARGAR MENÚ Y CREAR EMPLEADOS (OPCIONAL)
+
+Si ya existen empleados no vuelvas a crearlos. Puedes conservar los de Postman.
+Para una base recién instalada usa esta utilidad con la cuenta del dueño:
+
+.venv\Scripts\python.exe preparar_clase.py --motor mysql
+
+En SQLite omite --motor mysql.
+Pide tu login de administrador del RESTAURANTE y su contraseña.
+Carga 4 categorías, 10 productos y 6 mesas una sola vez.
+Pregunta si quieres crear un MESERO y una cuenta COCINA; elige sus claves temporales.
+Responde N para omitir un rol que ya existe. No restablece claves de cuentas existentes.
+Después inicia la API. El dueño también puede cargar el menú desde el botón del cliente.
+
+IMPORTANTE: config_mysql.json conecta Python con MySQL. Su user/password NO son
+el login del restaurante, a menos que por elección propia uses datos iguales.
+
+E. ABRIR CLIENTE CON LIVE SERVER
+
+1) En VS Code busca cliente_juan/cliente.html.
+2) Clic derecho -> Open with Live Server.
+3) Dirección habitual: http://127.0.0.1:5500/cliente_juan/cliente.html.
+   También puede ser /cliente.html si abriste solo cliente_juan como carpeta.
+4) Deja la API en puerto 5000 y Live Server en 5500.
+5) Escribe el usuario/clave del mesero o administrador del restaurante.
+6) El cliente hace login y guarda el Bearer automáticamente por pestaña.
+7) Si la clave es temporal, te pedirá cambiarla y volver a entrar.
+
+Sin Live Server también puedes visitar http://127.0.0.1:5000/ con la API encendida.
+Flask sirve el mismo cliente. Conserva backend_api y cliente_juan juntos.
+No abras cliente.html por doble clic/file:// porque usa módulos JavaScript.
+
+F. RECORRIDO DE JUAN
+
+1) Entra como Juan (MESERO). Aparece Mis pedidos; solo ve los suyos.
+2) Nuevo pedido -> Salón -> mesa libre -> Crear pedido.
+   También puedes elegir Para llevar, que no pide mesa.
+3) En el detalle selecciona categoría/producto/cantidad/notas -> Agregar.
+   AQUÍ SE EJECUTAN PEDIDODAO, PRODUCTODAO Y DETALLEDAO EN EL BACKEND.
+4) Editar en una línea -> cambia cantidad/notas -> Guardar cambios.
+5) Quitar en una línea -> confirma -> se elimina solo esa línea pendiente.
+6) Para preparar, cierra sesión y entra como COCINA.
+   Abre el pedido -> Iniciar preparación -> confirmar -> Marcar listo -> confirmar.
+7) Cierra sesión de cocina y vuelve como Juan. Abre la orden y, si hace falta,
+   pulsa Actualizar. Marcar entregado -> confirmar. La mesa queda libre.
+8) Crea otra orden y prueba Cancelar pedido -> motivo -> confirmar.
+9) Historial muestra autor, estado, fecha en Bogotá y motivo.
+10) Filtra por estado, busca en la página o usa Anterior/Siguiente si hay más de 50 pedidos.
+
+El administrador puede probar todos los pasos con su cuenta. Los botones de cocina son
+apoyo para completar el flujo; el trabajo principal del cliente son HU01-HU05 de Juan.
+
+G. REGLAS IMPORTANTES
+
+- Solo PENDIENTE permite agregar, editar o quitar líneas.
+- No se prepara un pedido vacío.
+- Solo LISTO permite entregar.
+- Mesero cancela PENDIENTE o EN_PREPARACION. Dueño también LISTO con motivo.
+- No se modifica un pedido ENTREGADO o CANCELADO.
+- Cancelar conserva historia; no se borra físicamente el pedido.
+- Los precios y totales se calculan en servidor, en centavos enteros.
+- La interfaz muestra pesos colombianos. 2200000 centavos son COP 22.000.
+- Si otra sesión cambió el pedido, el 409 recarga su versión. Revisa antes de repetir.
+- Si se pierde una respuesta aparece un aviso. Consulta o reintenta LA MISMA operación
+  desde ese aviso, conservando UUID y datos. No hagas otra creación a ciegas.
+- El token se guarda en sessionStorage, no la contraseña. Cerrar sesión lo limpia.
+
+H. CORS Y ERRORES
+
+CORS ya está configurado en poli/api.py e incluido en requirements.
+Permite localhost:5500 y 127.0.0.1:5500 con Content-Type, Authorization e Idempotency-Key.
+Si Live Server eligió 5501, vuelve a 5500 o define el origen exacto antes de iniciar Flask.
+En PowerShell, por ejemplo:
+
+$env:POLI_CORS_ORIGINS="http://127.0.0.1:5501,http://localhost:5501"
+.venv\Scripts\python.exe iniciar_api.py --motor mysql
+
+En CMD:
+set POLI_CORS_ORIGINS=http://127.0.0.1:5501,http://localhost:5501
+
+Si cambias el puerto de Flask, edita Dirección de la API en el formulario de acceso.
+Con Flask en 5001 la dirección es http://127.0.0.1:5001/api/v1.
+También puedes cambiar API_URL en cliente_juan/js/config.js antes del primer ingreso.
+
+401: sesión caducada, revocada o clave incorrecta -> vuelve a entrar.
+403: rol/pedido no permitido o clave temporal pendiente de cambiar.
+409: mesa ocupada, versión vieja o estado incompatible -> revisa mensaje y actualiza.
+422: revisa los campos del formulario, cantidades y motivo.
+503: MySQL apagado, configuración o permisos -> ejecuta --verificar.
+Sin conexión: revisa terminal de Flask, URL y origen de Live Server. F12 muestra detalles.
+ModuleNotFoundError flask_cors: instala requirements con el mismo Python de .venv.
+El diseño no carga: conserva vendor/bootstrap y css junto al HTML; no muevas el HTML solo.
+
+I. PRUEBAS Y ENTREGA
+
+Desde backend_api:
+.venv\Scripts\python.exe -m unittest discover -s tests -v
+
+Desde la carpeta completa, opcional si tienes Node 22+:
+node --test cliente_juan/tests/modelos.test.mjs
+
+No subas .venv, config_mysql.json, bases ni contraseñas a GitHub.
+Copia backend_api, cliente_juan, docs_juan y README_JUAN_MVC.md al repositorio.
+Los archivos originales de la clase son referencias; no tienes que ejecutar agenda/personas.
+La entrega es local: no se ha publicado una web ni se ha cambiado el repositorio remoto.

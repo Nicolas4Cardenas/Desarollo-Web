@@ -1,0 +1,7 @@
+{
+  "host": "127.0.0.1",
+  "port": 3306,
+  "user": "poli_driver_app",
+  "password": "TU_CLAVE_PRIVADA_DRIVER",
+  "database": "polirestaurante_driver"
+}

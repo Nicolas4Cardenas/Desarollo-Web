@@ -1,0 +1,57 @@
+DOS DAO EN UNA FUNCIONALIDAD - JUAN PARRA
+=======================================
+
+1. ¿QUÉ SIGNIFICA DAO?
+
+DAO significa Data Access Object (objeto de acceso a datos).
+Es una clase del BACKEND que encapsula consultas SQL de un conjunto de datos.
+Por ejemplo, PedidoDAO obtiene un pedido y sus datos; ProductoDAO consulta
+el producto, su categoría y su precio. El servicio decide las reglas del restaurante.
+
+No significa crear dos bases, ni dos conexiones independientes, ni que
+un formulario tenga dos tablas HTML. Tampoco basta con crear dos archivos
+DAO y nunca llamarlos. La operación debe utilizarlos de verdad.
+
+2. FUNCIONALIDAD QUE CUMPLE EL REQUISITO
+
+HU02: AGREGAR UN PRODUCTO A UN PEDIDO.
+
+Interfaz: abrir pedido pendiente -> elegir producto/cantidad -> Agregar.
+Endpoint: POST /api/v1/pedidos/<pedido_id>/detalles.
+Servicio: Restaurante.agregar_producto, en backend_api/poli/servicio.py.
+
+El mínimo original era dos DAO en una sola operación. En la entrega final,
+HU02 usa tres DAO de negocio con el mismo cursor:
+
+- PedidoDAO.obtener: consulta el pedido. El servicio valida dueño, estado
+  y versión. PedidoDAO.actualizar_version incrementa su versión.
+- ProductoDAO.obtener: consulta el producto y su categoría. El servicio
+  confirma que está disponible y toma el precio guardado en la base.
+- DetalleDAO.contar y DetalleDAO.crear: cuentan las líneas y guardan
+  la nueva con su precio, nombres y categoría históricos.
+
+Busca los tres archivos en backend_api/poli/dao/. El servicio también
+registra auditoría y recibo de operación. Base.transaccion confirma todo
+junto o revierte la operación ante cualquier error.
+
+3. CÓMO MOSTRARLO AL PROFESOR
+
+- Abre Restaurante.agregar_producto en backend_api/poli/servicio.py.
+- Pon puntos de interrupción en PedidoDAO.obtener, ProductoDAO.obtener
+  y DetalleDAO.crear.
+- Desde un pedido pendiente pulsa Agregar al pedido. Continúa con F5
+  después de cada pausa. Comprueba la inserción en el detalle.
+
+4. PRUEBA AUTOMÁTICA
+
+Archivo: backend_api/tests/test_dao_cors.py.
+Método: test_tres_dao_reales_comparten_cursor_en_peticion_hu02.
+
+Envía un POST a la API, observa tres métodos reales y verifica que usan
+el mismo cursor y que se guarda el importe correcto. Otra prueba simula
+un fallo de ProductoDAO y comprueba que no hay escrituras parciales.
+
+Ejecutar desde backend_api:
+.venv\Scripts\python.exe -m unittest discover -s tests -p test_dao_cors.py -v
+
+Inventario y usos de los 13 DAO: backend_api/docs/DAO_FINAL.md.

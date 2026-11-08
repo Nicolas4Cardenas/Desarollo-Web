@@ -1,0 +1,66 @@
+﻿POLIRESTAURANTE - CREDENCIALES DE DEMOSTRACIÓN
+============================================
+
+Usar después de ejecutar cargar_demo.py con el motor de tu base.
+Estas son cuentas del RESTAURANTE, no de MySQL ni de Postman.
+Elige Juan para probar HU01-HU05 y cocina1 para preparar sus pedidos.
+Son cuentas de clase con contraseñas conocidas; no usarlas como cuentas de producción.
+
+Nombre: Administrador de clase
+Usuario: admin.demo
+Contraseña: AdminClase2026!
+Rol: ADMINISTRADOR
+
+Nombre: Juan Parra
+Usuario: juan.demo
+Contraseña: MeseroClase2026!
+Rol: MESERO
+
+Nombre: Laura Gómez
+Usuario: mesero2.demo
+Contraseña: MeseroClase2026!
+Rol: MESERO
+
+Nombre: Carlos Ruiz
+Usuario: mesero3.demo
+Contraseña: MeseroClase2026!
+Rol: MESERO
+
+Nombre: Cocina principal
+Usuario: cocina1.demo
+Contraseña: CocinaClase2026!
+Rol: COCINA
+
+Nombre: Cocina auxiliar
+Usuario: cocina2.demo
+Contraseña: CocinaClase2026!
+Rol: COCINA
+
+Nombre: Cocina de turno
+Usuario: cocina3.demo
+Contraseña: CocinaClase2026!
+Rol: COCINA
+
+ACCESO
+------
+Flask: http://127.0.0.1:5000/
+Live Server: abrir cliente_juan/cliente.html con Open with Live Server.
+No necesitas Postman para entrar ni cambiar estas claves al primer ingreso.
+
+CARGA EN TU MYSQL ACTUAL (desde backend_api)
+.venv\Scripts\python.exe cargar_demo.py --motor mysql
+.venv\Scripts\python.exe iniciar_api.py --motor mysql
+
+SI SE BLOQUEÓ O CAMBIASTE UNA CUENTA DE ESTE ARCHIVO
+.venv\Scripts\python.exe cargar_demo.py --motor mysql --restablecer-claves-demo
+Ese parámetro solo restablece las cuentas creadas por esta carga.
+No cambia las contraseñas de tus cuentas anteriores.
+
+NOTAS
+- La base sigue siendo polirestaurante_driver. Conserva tu config_mysql.json.
+- Las mayúsculas, números y el signo ! de las contraseñas sí importan.
+- No hay espacios al principio ni al final de una contraseña.
+- Los ID dependen de la base existente; los logins anteriores son los que debes usar.
+- Carga: 1 administrador, 3 meseros, 3 cocineros; catálogo de 6 categorías, 20 productos y 12 mesas.
+- Si ya hay productos/mesas con los mismos nombres/números, se conservan.
+- Repetir la carga normal no duplica datos ni restablece contraseñas.

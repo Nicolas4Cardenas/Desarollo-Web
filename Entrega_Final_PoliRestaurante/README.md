@@ -10,7 +10,7 @@ desde la página y un guion de sustentación.
 - [DAO_FINAL.md](backend_api/docs/DAO_FINAL.md): inventario de los 13 DAO y cómo sustentarlos.
 - `docs_juan/`: explicación de la operación de agregar productos.
 
-Los reportes usan fechas y horas de Colombia. Si actualizas desde la versión anterior, instala nuevamente los requisitos; conserva tu configuración y la misma base.
+Los reportes usan fechas y horas de Colombia.
 
 Para entrar: arranca Flask con el motor de tu base y abre
 [http://127.0.0.1:5000/](http://127.0.0.1:5000/).
